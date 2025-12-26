@@ -1,0 +1,41 @@
+/* basic dark theme overrides */
+
+.theme-dark,
+.theme-dark body,
+body.dark-mode {
+    background: #0f1720 !important;
+    color: #dbeafe !important;
+}
+
+.theme-dark .card,
+.theme-dark .card-modern,
+body.dark-mode .card,
+body.dark-mode .card-modern {
+    background: #071726 !important;
+    color: #e6f0f6 !important;
+    border-color: rgba(255,255,255,0.04) !important;
+}
+
+.theme-dark .sidebar,
+body.dark-mode .sidebar {
+    background: #064e4b !important;
+    color: #d1f5f2 !important;
+}
+
+.theme-dark .form-control,
+.theme-dark .form-select,
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: #0b1b26 !important;
+    color: #dbeafe !important;
+    border-color: rgba(255,255,255,0.06) !important;
+}
+
+.theme-dark .btn-orange,
+body.dark-mode .btn-orange {
+    background: #ffb000 !important;
+    color: #000 !important;
+}
+
+/* small tweaks */
+.theme-dark a { color: #93c5fd !important; }

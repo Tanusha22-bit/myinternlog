@@ -1,0 +1,82 @@
+@extends('layouts.student-dashboard')
+
+@section('title', 'Internship Detail')
+
+@section('styles')
+<style>
+.card-modern {
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+    background: #fff;
+    margin-bottom: 2rem;
+}
+.card-modern .bi {
+    color: #6366F1;
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+    vertical-align: -0.2em;
+}
+.detail-label {
+    font-weight: bold;
+    color: #222;
+}
+.detail-row {
+    margin-bottom: 0.7rem;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .card-modern {
+        padding: 1.2rem !important;
+    }
+}
+.btn-indigo {
+    background: #6366F1;
+    color: #fff !important;
+    border: none;
+    border-radius: 999px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-indigo:hover, .btn-indigo:focus {
+    background: #4F46E5;
+    color: #fff !important;
+}
+.btn-indigo .bi {
+    color: inherit !important;
+}
+</style>
+@endsection
+
+@section('content')
+<div class="d-flex align-items-center mb-4">
+    <h2 class="me-auto mb-0"><i class="bi bi-briefcase"></i> Internship <span class="brand-highlight">Detail</span></h2>
+</div>
+<div class="card card-modern p-4">
+    <div class="detail-row"><i class="bi bi-info-circle"></i> <span class="detail-label">Status:</span>&nbsp; {{ ucfirst($internship->status) }}</div>
+    <div class="detail-row"><i class="bi bi-building"></i> <span class="detail-label">Company:</span>&nbsp; {{ $internship->company_name }}</div>
+    <div class="detail-row"><i class="bi bi-person-badge"></i> <span class="detail-label">Industry Supervisor:</span>&nbsp; {{ $internship->industrySupervisor->user->name ?? '-' }}</div>
+    <div class="detail-row"><i class="bi bi-person-badge-fill"></i> <span class="detail-label">University Supervisor:</span>&nbsp; {{ $internship->universitySupervisor->user->name ?? '-' }}</div>
+    <div class="detail-row"><i class="bi bi-calendar-event"></i> <span class="detail-label">Start Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->start_date)->format('d M Y') }}</div>
+    <div class="detail-row"><i class="bi bi-calendar-check"></i> <span class="detail-label">End Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->end_date)->format('d M Y') }}</div>
+    <div class="detail-row"><i class="bi bi-list-task"></i> <span class="detail-label">Total Tasks:</span>&nbsp; {{ $internship->tasks->count() }}</div>
+    <div class="detail-row"><i class="bi bi-journal-text"></i> <span class="detail-label">Total Daily Reports:</span>&nbsp; {{ $internship->dailyReports->count() }}</div>
+    <div class="detail-row">
+    <i class="bi bi-file-earmark-pdf"></i>
+    <span class="detail-label">Offer Letter:</span>&nbsp;
+    @if($internship->offer_letter)
+        <a href="{{ asset('storage/' . $internship->offer_letter) }}" target="_blank" class="btn btn-indigo btn-sm">
+            <i class="bi bi-eye"></i> View PDF
+        </a>
+    @else
+        <span class="text-muted">Not uploaded</span>
+    @endif
+    </div>  
+    <div class="text-end mt-4">
+        <a href="{{ route('internship.edit', $internship->id) }}" class="btn btn-indigo">
+            <i class="bi bi-pencil"></i> Edit Internship Details
+        </a>
+    </div>
+</div>
+@endsection
