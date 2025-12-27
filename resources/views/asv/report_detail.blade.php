@@ -76,14 +76,22 @@
     </div>
 </div>
 <div class="card card-modern p-4">
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
     <form method="POST" action="{{ route('supervisor.university.report.feedback', $report->id) }}">
         @csrf
         <div class="mb-3">
             <label class="form-label" style="font-weight:600;">Supervisor Feedback</label>
-            <textarea name="uni_feedback" class="form-control" rows="4" required>{{ $report->uni_feedback }}</textarea>
+            <textarea name="uni_feedback" class="form-control" rows="4" 
+                {{ $report->uni_feedback ? 'readonly' : 'required' }}>{{ $report->uni_feedback }}</textarea>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-indigo">Submit Feedback</button>
+            @if(!$report->uni_feedback)
+                <button class="btn btn-indigo">Submit Feedback</button>
+            @endif
             <a href="{{ route('supervisor.university.student.reports', $report->student_id) }}" class="btn btn-danger-custom">Back to Reports</a>
         </div>
     </form>

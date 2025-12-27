@@ -139,8 +139,8 @@ public function submitFeedback(Request $request, $id)
         'status' => 'reviewed',
     ]);
 
-    return redirect()->route('supervisor.university.student.reports', $report->student_id)
-        ->with('success', 'Feedback submitted!');
+    return redirect()->route('supervisor.university.report.show', $id)
+    ->with('success', 'Feedback submitted successfully!');
 }
 
 public function studentReports(Request $request, $studentId)

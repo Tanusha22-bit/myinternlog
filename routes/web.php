@@ -26,7 +26,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 //Route::get('/dashboard/student', fn() => view('dashboards.student'))->middleware('auth')->name('student.dashboard');
 Route::get('/dashboard/industry', fn() => view('dashboards.industry'))->middleware('auth');
-Route::get('/dashboard/university', fn() => view('dashboards.university'))->middleware('auth');
+Route::get('/dashboard/university', [UniversitySupervisorDashboardController::class, 'index'])->middleware('auth');
+//Route::get('/dashboard/university', fn() => view('dashboards.university'))->middleware('auth');
 Route::get('/dashboard/admin', fn() => view('dashboards.admin'))->middleware('auth');
 
 //Routes for Daily Report

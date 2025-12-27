@@ -21,6 +21,11 @@
         background: #4F46E5;
         color: #fff !important;
     }
+        .btn-warning-custom {
+        background: #FBBF24;
+        color: #0F172A !important;
+    }
+    .btn-warning-custom:hover { background: #F59E42; color: #fff !important; }
     .card-modern {
         border-radius: 18px;
         box-shadow: 0 2px 16px rgba(99,102,241,0.08);
@@ -107,7 +112,7 @@
                         <button class="btn btn-indigo btn-sm view-details-btn" data-id="{{ $student->id }}">
                             <i class="bi bi-eye"></i> 
                         </button>
-                            <a href="{{ route('supervisor.university.student.reports', $student->id) }}" class="btn btn-indigo btn-sm">
+                            <a href="{{ route('supervisor.university.student.reports', $student->id) }}" class="btn btn-warning-custom btn-sm">
                             <i class="bi bi-journal-text"></i> 
                             </a>
                     </td>

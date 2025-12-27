@@ -141,16 +141,18 @@
                         @endif
                     </td>
                     <td>
-                    <a href="{{ route('supervisor.university.report.show', $report->id) }}" class="btn btn-indigo btn-pill btn-sm" title="View">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    <button type="button" class="btn btn-warning-custom btn-pill btn-sm edit-feedback-btn" 
-                        data-id="{{ $report->id }}" 
-                        data-feedback="{{ $report->uni_feedback ?? '' }}"
-                        title="Edit Feedback">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    </td>
+    <a href="{{ route('supervisor.university.report.show', $report->id) }}" class="btn btn-indigo btn-pill btn-sm" title="View">
+        <i class="bi bi-eye"></i>
+    </a>
+    <button type="button"
+        class="btn btn-warning-custom btn-pill btn-sm edit-feedback-btn"
+        data-id="{{ $report->id }}"
+        data-feedback="{{ $report->uni_feedback ?? '' }}"
+        title="Edit Feedback"
+        {{ empty($report->uni_feedback) ? 'disabled' : '' }}>
+        <i class="bi bi-pencil"></i>
+    </button>
+</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -171,8 +173,11 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <textarea name="uni_feedback" id="feedbackTextarea" class="form-control" rows="4" required></textarea>
-        </div>
+    <div id="noFeedbackMsg" class="alert alert-warning" style="display:none;">
+        No feedback available to edit.
+    </div>
+    <textarea name="uni_feedback" id="feedbackTextarea" class="form-control" rows="4" required></textarea>
+</div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-indigo">Save</button>
           <button type="button" class="btn btn-danger-custom" id="deleteFeedbackBtn">Delete</button>
@@ -191,14 +196,24 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentReportId = null;
 
     document.querySelectorAll('.edit-feedback-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            currentReportId = this.getAttribute('data-id');
-            feedbackTextarea.value = this.getAttribute('data-feedback');
-            feedbackForm.action = `/supervisor/university/report/${currentReportId}/feedback`;
-            deleteBtn.style.display = feedbackTextarea.value.trim() ? 'inline-block' : 'none';
-            editModal.show();
-        });
+    btn.addEventListener('click', function() {
+        currentReportId = this.getAttribute('data-id');
+        let feedback = this.getAttribute('data-feedback');
+        feedbackTextarea.value = feedback;
+        feedbackForm.action = `/supervisor/university/report/${currentReportId}/feedback`;
+        if (feedback.trim()) {
+            feedbackTextarea.style.display = '';
+            deleteBtn.style.display = 'inline-block';
+            feedbackTextarea.readOnly = false;
+            document.getElementById('noFeedbackMsg').style.display = 'none';
+        } else {
+            feedbackTextarea.style.display = 'none';
+            deleteBtn.style.display = 'none';
+            document.getElementById('noFeedbackMsg').style.display = '';
+        }
+        editModal.show();
     });
+});
 
     deleteBtn.addEventListener('click', function(e) {
         e.preventDefault();
