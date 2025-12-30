@@ -3,27 +3,80 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UniversitySupervisorProfileController extends Controller
 {
-    public function show(Request $request)
-    {
-        $profile = DB::table('university_supervisors')->where('user_id', $request->user()->id)->first();
-        return view('asv.profile', compact('profile'));
+
+public function show()
+{
+    $user = auth()->user();
+    $supervisor = \DB::table('university_supervisors')->where('user_id', $user->id)->first();
+
+    // Activity stats
+    $studentsCount = \DB::table('internships')->where('university_sv_id', $supervisor->id)->count();
+    $feedbackGiven = \DB::table('daily_reports')
+        ->join('internships', 'daily_reports.internship_id', '=', 'internships.id')
+        ->where('internships.university_sv_id', $supervisor->id)
+        ->whereNotNull('uni_feedback')
+        ->count();
+    $activeInternships = \DB::table('internships')->where('university_sv_id', $supervisor->id)->where('status', 'active')->count();
+    $completedInternships = \DB::table('internships')->where('university_sv_id', $supervisor->id)->where('status', 'completed')->count();
+
+    return view('asv.profile', compact('user', 'supervisor', 'studentsCount', 'feedbackGiven', 'activeInternships', 'completedInternships'));
+}
+
+public function update(Request $request)
+{
+    $user = auth()->user();
+    $supervisor = \DB::table('university_supervisors')->where('user_id', $user->id)->first();
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        'department' => 'required|string|max:255',
+        'phone' => 'nullable|string|max:30',
+        'profile_pic' => 'nullable|image|max:2048',
+    ]);
+
+    // Handle profile picture
+    if ($request->hasFile('profile_pic')) {
+        $path = $request->file('profile_pic')->store('profile_pics', 'public');
+        \DB::table('users')->where('id', $user->id)->update(['profile_pic' => $path]);
     }
 
-    public function update(Request $request)
-    {
-        $data = $request->validate([
-            'department' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:255',
-        ]);
+    // Update user info
+    \DB::table('users')->where('id', $user->id)->update([
+        'name' => $request->name,
+        'email' => $request->email,
+    ]);
+    // Update supervisor info
+    \DB::table('university_supervisors')->where('id', $supervisor->id)->update([
+        'department' => $request->department,
+        'phone' => $request->phone,
+    ]);
 
-        DB::table('university_supervisors')->updateOrInsert(
-            ['user_id' => $request->user()->id],
-            $data + ['updated_at' => now()]
-        );
+    return back()->with('success', 'Profile updated successfully!');
+}
 
-        return redirect()->route('supervisor.university.profile')->with('success', 'Profile updated!');
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = auth()->user();
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect.']);
     }
+
+    \DB::table('users')->where('id', $user->id)->update([
+        'password' => Hash::make($request->password),
+    ]);
+
+    return back()->with('success', 'Password updated successfully!');
+}
 }

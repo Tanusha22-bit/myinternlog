@@ -129,6 +129,9 @@
                 <a href="{{ route('supervisor.university.students') }}" class="nav-link{{ request()->routeIs('supervisor.university.students') ? ' active' : '' }}">
                     <i class="bi bi-people"></i> My Student
                 </a>
+                <a href="{{ route('supervisor.university.progress') }}" class="nav-link{{ request()->routeIs('supervisor.university.progress') ? ' active' : '' }}">
+                    <i class="bi bi-graph-up"></i> Student Progress
+                </a>
                 <a href="{{ route('supervisor.university.profile') }}" class="nav-link{{ request()->routeIs('supervisor.university.profile') ? ' active' : '' }}">
                     <i class="bi bi-person"></i> Profile
                 </a>

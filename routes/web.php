@@ -10,6 +10,7 @@ use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\UniversitySupervisorStudentController;
 use App\Http\Controllers\UniversitySupervisorProfileController;
+use App\Http\Controllers\UniversitySupervisorProgressController;
 use App\Http\Controllers\UniversitySupervisorDashboardController;
 
 
@@ -74,11 +75,14 @@ Route::middleware(['auth'])
 Route::middleware(['auth'])->group(function () {
     Route::get('/supervisor/university/students', [UniversitySupervisorStudentController::class, 'index'])->name('supervisor.university.students');
     Route::get('/supervisor/university/student/{id}', [UniversitySupervisorStudentController::class, 'show'])->name('supervisor.university.student.show');
-    Route::get('/supervisor/university/profile', [UniversitySupervisorProfileController::class, 'show'])->name('supervisor.university.profile');
-    Route::post('/supervisor/university/profile', [UniversitySupervisorProfileController::class, 'update'])->name('supervisor.university.profile.update');
+    Route::get('/supervisor/profile', [UniversitySupervisorProfileController::class, 'show'])->name('supervisor.university.profile');
+    Route::post('/supervisor/profile', [UniversitySupervisorProfileController::class, 'update'])->name('supervisor.university.profile.update');
+    Route::post('/supervisor/profile/password', [UniversitySupervisorProfileController::class, 'updatePassword'])->name('supervisor.university.profile.password');
     Route::get('/supervisor/university/student/{id}/reports', [UniversitySupervisorStudentController::class, 'studentReports'])->name('supervisor.university.student.reports');
     Route::get('/supervisor/university/report/{id}', [UniversitySupervisorStudentController::class, 'showReport'])->name('supervisor.university.report.show');
     Route::post('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'submitFeedback'])->name('supervisor.university.report.feedback');
+    Route::get('/supervisor/university/progress', [UniversitySupervisorProgressController::class, 'index'])->name('supervisor.university.progress')->middleware('auth');
+    Route::get('/supervisor/university/progress/download', [UniversitySupervisorProgressController::class, 'downloadCsv'])->name('supervisor.university.progress.download')->middleware('auth');
     Route::delete('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'deleteFeedback']);
 });
 
