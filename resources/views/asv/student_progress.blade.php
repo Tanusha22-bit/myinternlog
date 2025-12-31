@@ -30,6 +30,33 @@
     }   
     .progress-action-btn.bg-green:hover { background: #16a34a; }
     .progress-action-btn.bg-yellow:hover { background: #eab308; color: #fff !important; }
+    .progress-action-btn.bg-indigo {
+        background: #6366F1;
+        color: #fff !important;
+    }
+    .progress-action-btn.bg-indigo:hover {
+        background: #4F46E5;
+    }
+    .btn-pill {
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.4rem 1.2rem;
+        border: none;
+        background: #6366F1;
+        color: #fff !important;
+        transition: background 0.2s;
+    }
+    .btn-pill:hover {
+        background: #4F46E5;
+    }
+    .progress-action-btn.sm {
+        font-size: 1rem;
+        padding: 0.4rem 1.2rem;
+        width: auto;
+        min-width: 100px;
+        margin-bottom: 0;
+    }
 </style>
 @endsection
 
@@ -77,11 +104,13 @@
         <input type="text" name="search" class="form-control" placeholder="Search by name or matric ID..." value="{{ request('search') }}">
     </div>
     <div class="col-md-2">
-        <button class="btn btn-indigo w-100" type="submit"><i class="bi bi-search"></i> Search</button>
+        <button class="progress-action-btn bg-indigo sm" type="submit">
+            <i class="bi bi-search"></i> Search
+        </button>
     </div>
     <div class="col-md-3 text-end">
         <a href="{{ route('supervisor.university.progress.download', request()->all()) }}" class="progress-action-btn bg-green">Download Progress Report</a>
-        <a href="#" class="progress-action-btn bg-yellow">Send Reminder</a>
+        <!-- <a href="#" class="progress-action-btn bg-yellow">Send Reminder</a> -->
     </div>
 </form>
 
@@ -125,8 +154,8 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{{ route('supervisor.university.student.reports', $data['student']->id) }}" class="btn btn-indigo btn-sm btn-pill">
-                            <i class="bi bi-eye"></i> View
+                        <a href="{{ route('supervisor.university.student.reports', $data['student']->id) }}" class="btn-pill">
+                            <i class="bi bi-eye"></i>
                         </a>
                     </td>
                 </tr>

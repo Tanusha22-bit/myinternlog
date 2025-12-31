@@ -35,6 +35,7 @@ public function update(Request $request)
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        'staff_id' => 'required|string|max:255',
         'department' => 'required|string|max:255',
         'phone' => 'nullable|string|max:30',
         'profile_pic' => 'nullable|image|max:2048',
@@ -53,6 +54,7 @@ public function update(Request $request)
     ]);
     // Update supervisor info
     \DB::table('university_supervisors')->where('id', $supervisor->id)->update([
+        'staff_id' => $request->staff_id,
         'department' => $request->department,
         'phone' => $request->phone,
     ]);

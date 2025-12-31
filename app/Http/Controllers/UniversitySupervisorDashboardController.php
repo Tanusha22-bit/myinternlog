@@ -41,9 +41,26 @@ public function index(Request $request)
     // Show only a few students for summary
     $studentSummary = $students->take(3);
 
+    $announcements = \DB::table('announcements')
+    ->where(function($q) {
+        $q->where('role', 'university_sv')->orWhere('role', 'all')->orWhereNull('role');
+    })
+    ->orderByDesc('created_at')
+    ->limit(5)
+    ->get();
+
+$importantDates = \DB::table('important_dates')
+    ->where(function($q) {
+        $q->where('role', 'university_sv')->orWhere('role', 'all')->orWhereNull('role');
+    })
+    ->orderBy('date')
+    ->limit(5)
+    ->get();
+
     return view('dashboards.university', compact(
-        'totalStudents', 'activeInternships', 'completedInternships',
-        'reportsThisMonth', 'recentReports', 'studentSummary'
-    ));
+    'totalStudents', 'activeInternships', 'completedInternships',
+    'reportsThisMonth', 'recentReports', 'studentSummary',
+    'announcements', 'importantDates'
+));
 }
 }

@@ -131,7 +131,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Staff ID</label>
-                                <input type="text" class="form-control" value="{{ $supervisor->staff_id }}" readonly>
+                                <input type="text" name="staff_id" class="form-control" value="{{ $supervisor->staff_id }}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Department</label>

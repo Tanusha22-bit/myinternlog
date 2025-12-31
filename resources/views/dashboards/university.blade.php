@@ -128,7 +128,7 @@
 </div>
 
 <div class="row g-4 mb-4">
-    <!-- Analytics Cards -->
+    <!-- Analytics Cards (still 4 in a row for summary) -->
     <div class="col-md-3 d-flex">
         <div class="dashboard-card bg-indigo flex-fill text-center">
             <div class="fw-bold mb-1"><i class="bi bi-people"></i> Total Students</div>
@@ -155,10 +155,10 @@
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-4 mb-4">
     <!-- Student Overview -->
-    <div class="col-md-4 d-flex">
-        <div class="dashboard-card bg-light-indigo flex-fill">
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-indigo flex-fill w-100">
             <div class="fw-bold mb-2"><i class="bi bi-people"></i> Student Overview</div>
             <ul class="list-group list-group-flush mb-3">
                 @foreach($studentSummary as $student)
@@ -176,22 +176,47 @@
             <a href="{{ route('supervisor.university.students') }}" class="dashboard-btn dashboard-btn-outline">View All Students</a>
         </div>
     </div>
-
-    <!-- Quick Actions -->
-    <div class="col-md-4 d-flex">
-        <div class="dashboard-card bg-light-green flex-fill">
-            <div class="fw-bold mb-2"><i class="bi bi-lightning-charge"></i> Quick Actions</div>
-            <div class="d-grid gap-2">
-                <a href="{{ route('supervisor.university.students') }}" class="dashboard-btn bg-green">Add Feedback</a>
-                <a href="#" class="dashboard-btn bg-blue">Schedule Meeting</a>
-                <a href="#" class="dashboard-btn bg-yellow">Download Reports</a>
-            </div>
+    <!-- Announcements -->
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-green flex-fill w-100">
+            <div class="fw-bold mb-2"><i class="bi bi-megaphone"></i> Announcements</div>
+            <ul class="list-group list-group-flush mb-3">
+                @forelse($announcements as $announcement)
+                    <li class="list-group-item">
+                        <strong>{{ $announcement->title }}</strong>
+                        <div style="font-size:0.95em;">{!! \Illuminate\Support\Str::limit(strip_tags($announcement->content), 60) !!}</div>
+                        <div class="text-muted" style="font-size:0.85em;">{{ $announcement->created_at->format('d M Y') }}</div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No announcements.</li>
+                @endforelse
+            </ul>
         </div>
     </div>
+</div>
 
+<div class="row g-4 mb-4">
+    <!-- Important Dates -->
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-blue flex-fill w-100">
+            <div class="fw-bold mb-2"><i class="bi bi-calendar-event"></i> Important Dates</div>
+            <ul class="list-group list-group-flush mb-3">
+                @forelse($importantDates as $date)
+                    <li class="list-group-item">
+                        <strong>{{ $date->title }}</strong>
+                        <div class="text-muted" style="font-size:0.95em;">
+                            {{ \Carbon\Carbon::parse($date->date)->format('d M Y') }}
+                        </div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No important dates.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
     <!-- Reports Haven't Viewed -->
-    <div class="col-md-4 d-flex">
-        <div class="dashboard-card bg-light-blue flex-fill">
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-blue flex-fill w-100">
             <div class="fw-bold mb-2"><i class="bi bi-eye-slash"></i> Reports Haven't Viewed</div>
             <ul class="list-group list-group-flush mb-3">
                 @forelse($recentReports as $report)

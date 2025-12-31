@@ -7,6 +7,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @php
+    $user = Auth::user();
+@endphp
+
+@if (!request()->routeIs('supervisor.university.profile'))
+    <div class="dropdown" style="position: absolute; top: 24px; right: 32px;">
+        <a href="{{ route('supervisor.university.profile') }}" class="d-flex align-items-center text-decoration-none" style="gap: 0.75rem;">
+            <img src="{{ $user->profile_pic ? asset('storage/'.$user->profile_pic) : asset('images/default-avatar.png') }}"
+                 alt="Profile" width="44" height="44"
+                 style="object-fit:cover; border-radius:50%; border:2px solid #6366F1; background:#EEF2FF;">
+            <span class="fw-semibold text-dark">{{ $user->name }}</span>
+        </a>
+    </div>
+@endif
     <style>
         :root {
             --bg-main: #F3F4F6;

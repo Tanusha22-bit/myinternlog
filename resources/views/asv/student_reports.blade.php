@@ -85,8 +85,7 @@
 
 @section('content')
 <div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Reports for <span class="brand-highlight">{{ $student->student_name }}</span></h2>
-    <a href="{{ route('supervisor.university.students') }}" class="btn btn-danger-custom ms-2">Back to Student List</a>
+    <h2 class="me-auto mb-0">Report <span class="brand-highlight">List</span></h2>
 </div>
 <div class="row mb-4">
     <div class="col-md-4">
@@ -109,16 +108,20 @@
     </div>
 </div>
 
-<form method="get" class="mb-3">
-    <div class="input-group" style="max-width:300px;">
-        <input type="date" name="date" class="form-control" value="{{ request('date') }}">
-        <input type="hidden" name="feedback" value="{{ $feedback }}">
-        <button class="btn btn-indigo" type="submit"><i class="bi bi-search"></i> Search</button>
-        @if(request('date'))
-            <a href="?{{ http_build_query(array_merge(request()->except('date','page'))) }}" class="btn btn-outline-secondary">Reset</a>
-        @endif
-    </div>
-</form>
+<div class="d-flex align-items-center mb-3" style="gap: 1rem;">
+    <form method="get" class="d-flex align-items-center gap-2 flex-grow-1" style="flex-wrap: wrap;">
+        <div class="input-group" style="max-width:300px;">
+            <input type="date" name="date" class="form-control" value="{{ request('date') }}">
+            <input type="hidden" name="feedback" value="{{ $feedback }}">
+            <button class="btn btn-indigo" type="submit"><i class="bi bi-search"></i> Search</button>
+            @if(request('date'))
+                <a href="?{{ http_build_query(array_merge(request()->except('date','page'))) }}" class="btn btn-outline-secondary">Reset</a>
+            @endif
+        </div>
+    </form>
+    <a href="{{ route('supervisor.university.students') }}" class="btn btn-danger-custom ms-auto">Back to Student List</a>
+</div>
+
 <div class="card card-modern p-4">
     <div class="table-responsive">
         <table class="table align-middle">
