@@ -108,7 +108,6 @@
                 <a href="{{ route('admin.assign-supervisor') }}" class="nav-link {{ request()->routeIs('admin.assign-supervisor') ? 'active' : '' }}"><i class="bi bi-person-plus"></i>Assign Supervisor</a>
                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}"><i class="bi bi-people"></i>Manage Accounts</a>
                 <a href="{{ route('admin.profile') }}" class="nav-link {{ request()->routeIs('admin.profile') ? 'active' : '' }}"><i class="bi bi-person"></i>Profile</a>
-                <a href="{{ route('admin.settings.show') }}" class="nav-link {{ request()->routeIs('admin.settings.show') ? 'active' : '' }}" class="nav-link"><i class="bi bi-gear"></i>Settings</a>
             </nav>
             <form method="POST" action="{{ route('logout') }}" class="w-100">
                 @csrf

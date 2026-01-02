@@ -8,6 +8,8 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\IndustryReportController;
+use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\UniversitySupervisorStudentController;
 use App\Http\Controllers\UniversitySupervisorProfileController;
 use App\Http\Controllers\UniversitySupervisorProgressController;
@@ -84,6 +86,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supervisor/university/progress', [UniversitySupervisorProgressController::class, 'index'])->name('supervisor.university.progress')->middleware('auth');
     Route::get('/supervisor/university/progress/download', [UniversitySupervisorProgressController::class, 'downloadCsv'])->name('supervisor.university.progress.download')->middleware('auth');
     Route::delete('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'deleteFeedback']);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/industry/students', [IndustrySupervisorStudentController::class, 'index'])->name('industry.students');
+    Route::get('/industry/student/{id}', [IndustrySupervisorStudentController::class, 'show'])->name('industry.student.show');
+    Route::get('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryIndex'])->name('industry.tasks');
+    Route::post('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryStore'])->name('industry.tasks.store');
+    Route::get('/industry/tasks/{task}/edit', [App\Http\Controllers\TaskController::class, 'industryEdit'])->name('industry.tasks.edit');
+    Route::put('/industry/tasks/{task}', [App\Http\Controllers\TaskController::class, 'industryUpdate'])->name('industry.tasks.update');
+    Route::delete('/industry/tasks/{task}', [App\Http\Controllers\TaskController::class, 'industryDestroy'])->name('industry.tasks.destroy');
+    Route::get('/industry/reports', [IndustryReportController::class, 'index'])->name('industry.reports');
+    Route::post('/industry/reports/{report}/feedback', [IndustryReportController::class, 'feedback'])->name('industry.reports.feedback');
 });
 
 //Route for admin manage accounts
