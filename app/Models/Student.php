@@ -9,20 +9,20 @@ class Student extends Model
 {
     use HasFactory;
 
-        protected $fillable = [
-            'user_id',
-            'student_id',
-            'program',
-            'semester',
-            'phone',
-        ];
+    protected $fillable = [
+        'user_id',
+        'student_id',
+        'program',
+        'semester',
+        'phone',
+    ];
 
-        public function user()
-        {
-            return $this->belongsTo(\App\Models\User::class);
-        }
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 
-        public function internship() {
-            return $this->hasOne(\App\Models\Internship::class);
-        }
+    public function internship() {
+        return $this->hasOne(\App\Models\Internship::class, 'student_id');
+    }
 }

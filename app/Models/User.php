@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,17 +13,19 @@ class User extends Authenticatable
     
     public function student()
     {
-        return $this->hasOne(\App\Models\Student::class);
+        return $this->hasOne(\App\Models\Student::class, 'user_id');
     }
-    public function internship() { return $this->hasOne(Internship::class, 'student_id', 'id'); }
+    // Remove or comment out this incorrect relationship:
+    // public function internship()
+    // {
+    //     return $this->hasOne(\App\Models\Internship::class, 'student_id', 'id');
+    // }   
     public function universitySupervisor() { return $this->hasOne(UniversitySupervisor::class); }
-    public function industrySupervisor() { return $this->hasOne(IndustrySupervisor::class); }
+    public function industrySupervisor()
+    {
+        return $this->hasOne(\App\Models\IndustrySupervisor::class, 'user_id');
+    }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -32,21 +33,11 @@ class User extends Authenticatable
         'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',

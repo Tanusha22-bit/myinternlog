@@ -1,30 +1,27 @@
 @extends('layouts.admin-dashboard')
 
 @section('title', 'Manage Account')
+@section('page_icon', 'bi bi-people')
 
 @section('content')
 
-    @if(session('success'))
-        <div class="alert alert-success">
-         {{ session('success') }}
-        </div>
-    @endif
-
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Manage <span class="brand-highlight">Account</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
     </div>
-</div>
-<div class="card card-modern p-4">
-    <div class="d-flex mb-3">
+@endif
+
+<div class="card-modern p-4 mb-4">
+    <div class="d-flex mb-3 align-items-center">
         <form class="me-2 flex-grow-1" method="GET" action="{{ route('admin.users.index') }}">
             <input type="text" name="search" class="form-control" placeholder="Search Bar" value="{{ $search ?? '' }}">
         </form>
-        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addUserModal">Add User</button>
+        <button class="btn btn-indigo" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="bi bi-person-plus"></i> Add User
+        </button>
     </div>
-    <table class="table table-bordered bg-white">
-        <thead>
+    <table class="table align-middle mb-0" style="border-radius:18px; overflow:hidden;">
+        <thead style="background:#f3f4f6;">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -39,19 +36,27 @@
                 <td>{{ ucfirst($user->role) }}</td>
                 <td>{{ $user->email }}</td>
                 <td>
-                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">View</button>
-                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
+                    <button class="btn btn-outline-primary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     <form method="POST" action="{{ route('admin.users.destroy', $user) }}" style="display:inline;">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this user?')">Delete</button>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="return confirm('Delete this user?')">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </form>
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
-    {{ $users->links() }}
+    <div class="mt-3">
+        {{ $users->links() }}
+    </div>
 </div>
 
 <!-- Modals Section (outside table for proper functionality) -->
@@ -59,10 +64,10 @@
 <!-- View User Modal -->
 <div class="modal fade" id="viewUserModal{{ $user->id }}" tabindex="-1" aria-labelledby="viewUserModalLabel{{ $user->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background: #b7e3e3; border-radius: 12px; border: none;">
+        <div class="modal-content card-modern p-3">
             <div class="modal-header" style="border-bottom: none;">
-                <h4 class="modal-title w-100 text-center" id="viewUserModalLabel{{ $user->id }}" style="font-weight: bold;">User Details</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: #009999; color: #fff; border-radius: 4px; margin-left: auto;"></button>
+                <h4 class="modal-title w-100 text-center" id="viewUserModalLabel{{ $user->id }}" style="font-weight: bold; color:#6366F1;">User Details</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p><strong>Name:</strong> {{ $user->name }}</p>
@@ -88,17 +93,17 @@
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ $user->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content" method="POST" action="{{ route('admin.users.update', $user) }}" style="background: #b7e3e3; border-radius: 12px; border: none;">
+        <form class="modal-content card-modern p-3" method="POST" action="{{ route('admin.users.update', $user) }}">
             @csrf
             @method('PUT')
             <div class="modal-header" style="border-bottom: none;">
-                <h4 class="modal-title w-100 text-center" id="editUserModalLabel{{ $user->id }}" style="font-weight: bold;">Edit User</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: #009999; color: #fff; border-radius: 4px; margin-left: auto;"></button>
+                <h4 class="modal-title w-100 text-center" id="editUserModalLabel{{ $user->id }}" style="font-weight: bold; color:#6366F1;">Edit User</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <label class="mb-1" style="font-weight: 500;">Name:</label>
+                <label class="mb-1 form-label">Name:</label>
                 <input type="text" name="name" class="form-control mb-3" value="{{ $user->name }}" required>
-                <label class="mb-1" style="font-weight: 500;">Role:</label>
+                <label class="mb-1 form-label">Role:</label>
                 <select name="role" class="form-control mb-3 user-role-select-edit" data-user="{{ $user->id }}" required>
                     <option value="student" @if($user->role=='student') selected @endif>Student</option>
                     <option value="industry_sv" @if($user->role=='industry_sv') selected @endif>Industry Supervisor</option>
@@ -107,31 +112,31 @@
                 </select>
                 <div id="editExtraFields{{ $user->id }}">
                     @if($user->role == 'student' && $user->student)
-                        <label class="mb-1" style="font-weight: 500;">Matric ID:</label>
+                        <label class="mb-1 form-label">Matric ID:</label>
                         <input type="text" name="matric_id" class="form-control mb-3" value="{{ $user->student->student_id }}">
-                        <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                        <label class="mb-1 form-label">Phone:</label>
                         <input type="text" name="student_phone" class="form-control mb-3" value="{{ $user->student->phone }}">
                     @elseif($user->role == 'university_sv' && $user->universitySupervisor)
-                        <label class="mb-1" style="font-weight: 500;">Staff ID:</label>
+                        <label class="mb-1 form-label">Staff ID:</label>
                         <input type="text" name="staff_id" class="form-control mb-3" value="{{ $user->universitySupervisor->staff_id }}">
-                        <label class="mb-1" style="font-weight: 500;">Department:</label>
+                        <label class="mb-1 form-label">Department:</label>
                         <input type="text" name="department" class="form-control mb-3" value="{{ $user->universitySupervisor->department }}">
-                        <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                        <label class="mb-1 form-label">Phone:</label>
                         <input type="text" name="university_phone" class="form-control mb-3" value="{{ $user->universitySupervisor->phone }}">
                     @elseif($user->role == 'industry_sv' && $user->industrySupervisor)
-                        <label class="mb-1" style="font-weight: 500;">Position:</label>
+                        <label class="mb-1 form-label">Position:</label>
                         <input type="text" name="position" class="form-control mb-3" value="{{ $user->industrySupervisor->position }}">
-                        <label class="mb-1" style="font-weight: 500;">Company:</label>
+                        <label class="mb-1 form-label">Company:</label>
                         <input type="text" name="company" class="form-control mb-3" value="{{ $user->industrySupervisor->company }}">
-                        <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                        <label class="mb-1 form-label">Phone:</label>
                         <input type="text" name="industry_phone" class="form-control mb-3" value="{{ $user->industrySupervisor->phone }}">
                     @endif
                 </div>
-                <label class="mb-1" style="font-weight: 500;">Email:</label>
+                <label class="mb-1 form-label">Email:</label>
                 <input type="email" name="email" class="form-control mb-3" value="{{ $user->email }}" required>
             </div>
             <div class="modal-footer" style="border-top: none; justify-content: center;">
-                <button type="submit" class="btn" style="background: #FFC107; color: #000; font-weight: bold; width: 60%;">Edit</button>
+                <button type="submit" class="btn btn-indigo px-4" style="font-weight: bold;">Edit</button>
             </div>
         </form>
     </div>
@@ -141,16 +146,16 @@
 <!-- Add User Modal -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content" method="POST" action="{{ route('admin.users.store') }}" style="background: #b7e3e3; border-radius: 12px; border: none;">
+        <form class="modal-content card-modern p-3" method="POST" action="{{ route('admin.users.store') }}">
             @csrf
             <div class="modal-header" style="border-bottom: none;">
-                <h4 class="modal-title w-100 text-center" id="addUserModalLabel" style="font-weight: bold;">Add User</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background: #009999; color: #fff; border-radius: 4px; margin-left: auto;"></button>
+                <h4 class="modal-title w-100 text-center" id="addUserModalLabel" style="font-weight: bold; color:#6366F1;">Add User</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <label class="mb-1" style="font-weight: 500;">Name:</label>
+                <label class="mb-1 form-label">Name:</label>
                 <input type="text" name="name" class="form-control mb-3" required>
-                <label class="mb-1" style="font-weight: 500;">Role:</label>
+                <label class="mb-1 form-label">Role:</label>
                 <select name="role" class="form-control mb-3 user-role-select" data-target="#addExtraFields" required>
                     <option value="student">Student</option>
                     <option value="industry_sv">Industry Supervisor</option>
@@ -158,17 +163,39 @@
                     <option value="admin">Admin</option>
                 </select>
                 <div id="addExtraFields"></div>
-                <label class="mb-1" style="font-weight: 500;">Email:</label>
+                <label class="mb-1 form-label">Email:</label>
                 <input type="email" name="email" class="form-control mb-3" required>
-                <label class="mb-1" style="font-weight: 500;">Password:</label>
+                <label class="mb-1 form-label">Password:</label>
                 <input type="password" name="password" class="form-control mb-3" required>
             </div>
             <div class="modal-footer" style="border-top: none; justify-content: center;">
-                <button type="submit" class="btn" style="background: #FFC107; color: #000; font-weight: bold; width: 60%;">Create</button>
+                <button type="submit" class="btn btn-indigo px-4" style="font-weight: bold;">Create</button>
             </div>
         </form>
     </div>
 </div>
+
+@push('styles')
+<style>
+.card-modern {
+    border-radius: 22px;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+    background: #fff;
+    border: none;
+}
+.btn-indigo {
+    background: #6366F1;
+    color: #fff !important;
+    border-radius: 999px;
+    font-weight: 600;
+    border: none;
+    transition: background 0.2s;
+}
+.btn-indigo:hover { background: #4F46E5; }
+.form-label { font-weight: bold; }
+.table th, .table td { vertical-align: middle; }
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -182,31 +209,31 @@
             let html = '';
             if (role === 'student') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Matric ID:</label>
+                    <label class="mb-1 form-label">Matric ID:</label>
                     <input type="text" name="matric_id" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Program:</label>
+                    <label class="mb-1 form-label">Program:</label>
                     <input type="text" name="program" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Semester:</label>
+                    <label class="mb-1 form-label">Semester:</label>
                     <input type="text" name="semester" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="student_phone" class="form-control mb-3">
                 `;
             } else if (role === 'university_sv') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Staff ID:</label>
+                    <label class="mb-1 form-label">Staff ID:</label>
                     <input type="text" name="staff_id" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Department:</label>
+                    <label class="mb-1 form-label">Department:</label>
                     <input type="text" name="department" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="university_phone" class="form-control mb-3">
                 `;
             } else if (role === 'industry_sv') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Position:</label>
+                    <label class="mb-1 form-label">Position:</label>
                     <input type="text" name="position" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Company:</label>
+                    <label class="mb-1 form-label">Company:</label>
                     <input type="text" name="company" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="industry_phone" class="form-control mb-3">
                 `;
             }
@@ -232,31 +259,31 @@
             let html = '';
             if (role === 'student') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Matric ID:</label>
+                    <label class="mb-1 form-label">Matric ID:</label>
                     <input type="text" name="matric_id" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Program:</label>
+                    <label class="mb-1 form-label">Program:</label>
                     <input type="text" name="program" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Semester:</label>
+                    <label class="mb-1 form-label">Semester:</label>
                     <input type="text" name="semester" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="student_phone" class="form-control mb-3">
                 `;
             } else if (role === 'university_sv') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Staff ID:</label>
+                    <label class="mb-1 form-label">Staff ID:</label>
                     <input type="text" name="staff_id" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Department:</label>
+                    <label class="mb-1 form-label">Department:</label>
                     <input type="text" name="department" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="university_phone" class="form-control mb-3">
                 `;
             } else if (role === 'industry_sv') {
                 html = `
-                    <label class="mb-1" style="font-weight: 500;">Position:</label>
+                    <label class="mb-1 form-label">Position:</label>
                     <input type="text" name="position" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Company:</label>
+                    <label class="mb-1 form-label">Company:</label>
                     <input type="text" name="company" class="form-control mb-3" required>
-                    <label class="mb-1" style="font-weight: 500;">Phone:</label>
+                    <label class="mb-1 form-label">Phone:</label>
                     <input type="text" name="industry_phone" class="form-control mb-3">
                 `;
             }

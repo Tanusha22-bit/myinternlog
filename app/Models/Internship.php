@@ -9,8 +9,14 @@ class Internship extends Model
 {
     use HasFactory;
 
-    public function industrySupervisor() { return $this->belongsTo(IndustrySupervisor::class, 'industry_sv_id'); }
-    public function universitySupervisor() { return $this->belongsTo(UniversitySupervisor::class, 'university_sv_id'); }
+    public function industrySupervisor()
+    {
+        return $this->belongsTo(\App\Models\IndustrySupervisor::class, 'industry_sv_id');
+    }
+    public function universitySupervisor()
+    {
+        return $this->belongsTo(\App\Models\UniversitySupervisor::class, 'university_sv_id');
+    }
     public function student() { return $this->belongsTo(Student::class, 'student_id'); }
     
     protected $fillable = [

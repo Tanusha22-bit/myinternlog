@@ -1,5 +1,6 @@
 @extends('layouts.industry-dashboard')
 @section('title', 'Task Status')
+@section('page_icon', 'bi bi-list-task')
 
 @section('styles')
 <style>
@@ -14,10 +15,18 @@
         transition: background 0.2s;
     }
     .btn-indigo:hover { background: #4F46E5; }
+    .btn-purple {
+        background: #6366F1;
+        color: #fff !important;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        border: none;
+        transition: background 0.2s;
+    }
+    .btn-purple:hover { background: #4F46E5; }
 </style>
 @endsection
 @section('content')
-<h2 class="mb-4"><i class="bi bi-list-task"></i> Task <span class="brand-highlight">Status</span></h2>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -122,7 +131,7 @@
         <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?')"><i class="bi bi-trash"></i></button>
     </form>
     <!-- View Button -->
-    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}">
+    <button class="btn btn-sm  btn-purple" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}">
         <i class="bi bi-eye"></i>
     </button>
 </td>

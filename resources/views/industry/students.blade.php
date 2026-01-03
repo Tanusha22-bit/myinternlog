@@ -1,5 +1,6 @@
 @extends('layouts.industry-dashboard')
 @section('title', 'My Student')
+@section('page_icon', 'bi bi-person')
 
 @section('styles')
 <style>
@@ -49,7 +50,6 @@
 @endsection
 
 @section('content')
-<h2 class="mb-4"><i class="bi bi-people"></i> My <span class="brand-highlight" >Student</span></h2>
 
 @if($student)
 <div class="row g-4">

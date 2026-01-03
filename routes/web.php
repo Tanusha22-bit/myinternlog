@@ -90,6 +90,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/industry/students', [IndustrySupervisorStudentController::class, 'index'])->name('industry.students');
+    Route::get('/dashboard/industry', [App\Http\Controllers\IndustryDashboardController::class, 'index'])
+    ->middleware('auth');
     Route::get('/industry/student/{id}', [IndustrySupervisorStudentController::class, 'show'])->name('industry.student.show');
     Route::get('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryIndex'])->name('industry.tasks');
     Route::post('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryStore'])->name('industry.tasks.store');
@@ -97,24 +99,27 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/industry/tasks/{task}', [App\Http\Controllers\TaskController::class, 'industryUpdate'])->name('industry.tasks.update');
     Route::delete('/industry/tasks/{task}', [App\Http\Controllers\TaskController::class, 'industryDestroy'])->name('industry.tasks.destroy');
     Route::get('/industry/reports', [IndustryReportController::class, 'index'])->name('industry.reports');
+    Route::get('/industry/reports/{report}', [IndustryReportController::class, 'show'])->name('industry.reports.show');
     Route::post('/industry/reports/{report}/feedback', [IndustryReportController::class, 'feedback'])->name('industry.reports.feedback');
+    Route::get('/industry/profile', [App\Http\Controllers\IndustryProfileController::class, 'show'])->name('industry.profile');
+    Route::post('/industry/profile', [App\Http\Controllers\IndustryProfileController::class, 'update'])->name('industry.profile.update');
+    Route::post('/industry/profile/password', [App\Http\Controllers\IndustryProfileController::class, 'updatePassword'])->name('industry.profile.password');
 });
 
 //Route for admin manage accounts
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', fn() => view('dashboards.admin'))->name('admin.dashboard');
     Route::get('users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::post('users', [AdminUserController::class, 'store'])->name('admin.users.store');
     Route::put('users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
-});
-
-//Route for admin profile
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('profile', [ProfileController::class, 'show'])->name('admin.profile');
     Route::post('profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
     Route::post('profile/change-password', [ProfileController::class, 'changePassword'])->name('admin.profile.changePassword');
-    Route::get('/admin/assign-supervisor', [AdminUserController::class, 'assignSupervisorPage'])->name('admin.assign-supervisor');
-    Route::post('/admin/assign-supervisor', [AdminUserController::class, 'storeAssignment'])->name('admin.assign-supervisor.store');
-    Route::put('/admin/assign-supervisor/{internship}', [AdminUserController::class, 'updateAssignment'])->name('admin.assign-supervisor.update');
+    Route::get('/assign-supervisor', [AdminUserController::class, 'assignSupervisorPage'])->name('admin.assign-supervisor');
+    Route::post('/assign-supervisor', [AdminUserController::class, 'storeAssignment'])->name('admin.assign-supervisor.store');
+    Route::put('/assign-supervisor/{internship}', [AdminUserController::class, 'updateAssignment'])->name('admin.assign-supervisor.update');
 });
+
+
 
