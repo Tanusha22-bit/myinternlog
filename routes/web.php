@@ -119,6 +119,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/assign-supervisor', [AdminUserController::class, 'assignSupervisorPage'])->name('admin.assign-supervisor');
     Route::post('/assign-supervisor', [AdminUserController::class, 'storeAssignment'])->name('admin.assign-supervisor.store');
     Route::put('/assign-supervisor/{internship}', [AdminUserController::class, 'updateAssignment'])->name('admin.assign-supervisor.update');
+    Route::get('communications', [App\Http\Controllers\AdminCommunicationController::class, 'index'])->name('admin.communications.index');
+    Route::post('communications/announcement', [App\Http\Controllers\AdminCommunicationController::class, 'storeAnnouncement'])->name('admin.communications.announcement.store');
+    Route::put('communications/announcement/{announcement}', [App\Http\Controllers\AdminCommunicationController::class, 'updateAnnouncement'])->name('admin.communications.announcement.update');
+    Route::delete('communications/announcement/{announcement}', [App\Http\Controllers\AdminCommunicationController::class, 'destroyAnnouncement'])->name('admin.communications.announcement.destroy');
+    Route::post('communications/date', [App\Http\Controllers\AdminCommunicationController::class, 'storeDate'])->name('admin.communications.date.store');
+    Route::put('communications/date/{date}', [App\Http\Controllers\AdminCommunicationController::class, 'updateDate'])->name('admin.communications.date.update');
+    Route::delete('communications/date/{date}', [App\Http\Controllers\AdminCommunicationController::class, 'destroyDate'])->name('admin.communications.date.destroy');
 });
 
 

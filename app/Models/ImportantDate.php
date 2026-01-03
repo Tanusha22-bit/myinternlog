@@ -12,7 +12,7 @@ class ImportantDate extends Model
     protected $fillable = [
         'title',
         'date',
-        'for_students',
+        //'for_students',
         'role',
     ];
 }

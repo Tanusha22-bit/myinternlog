@@ -9,15 +9,31 @@ use Illuminate\Http\Request;
 class AdminUserController extends Controller
 {
     public function index(Request $request)
-    {
-        $search = $request->input('search');
-        $users = User::when($search, function ($query, $search) {
-            $query->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
-        })->paginate(10);
+{
+    $search = $request->input('search');
+    $role = $request->input('role');
 
-        return view('admin.manage-users', compact('users', 'search'));
-    }
+    $users = User::when($role && $role !== 'all', function ($query) use ($role) {
+            $query->where('role', $role);
+        })
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+            });
+        })
+        ->paginate(10);
+
+    $counts = [
+        'all' => User::count(),
+        'student' => User::where('role', 'student')->count(),
+        'university_sv' => User::where('role', 'university_sv')->count(),
+        'industry_sv' => User::where('role', 'industry_sv')->count(),
+        'admin' => User::where('role', 'admin')->count(),
+    ];
+
+    return view('admin.manage-users', compact('users', 'search', 'role', 'counts'));
+}
 
     public function store(Request $request)
     {

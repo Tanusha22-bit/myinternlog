@@ -12,7 +12,7 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'content',
-        'for_students',
+        //'for_students',
         'role',
         'created_by',
     ];

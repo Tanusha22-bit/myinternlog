@@ -11,17 +11,50 @@
     </div>
 @endif
 
+<div class="row mb-4">
+    <div class="col d-flex justify-content-center">
+        <div class="d-flex gap-3 justify-content-center flex-nowrap">
+            <a href="{{ route('admin.users.index', ['role' => 'all']) }}" class="filter-card card-modern card-all {{ ($role ?? 'all') === 'all' ? 'active' : '' }}">
+                <div class="fw-bold fs-5">All</div>
+                <div class="fs-4">{{ $counts['all'] }}</div>
+            </a>
+            <a href="{{ route('admin.users.index', ['role' => 'student']) }}" class="filter-card card-modern card-student {{ ($role ?? '') === 'student' ? 'active' : '' }}">
+                <div class="fw-bold fs-5">Students</div>
+                <div class="fs-4">{{ $counts['student'] }}</div>
+            </a>
+            <a href="{{ route('admin.users.index', ['role' => 'university_sv']) }}" class="filter-card card-modern card-university {{ ($role ?? '') === 'university_sv' ? 'active' : '' }}">
+                <div class="fw-bold fs-5">University Supervisor</div>
+                <div class="fs-4">{{ $counts['university_sv'] }}</div>
+            </a>
+            <a href="{{ route('admin.users.index', ['role' => 'industry_sv']) }}" class="filter-card card-modern card-industry {{ ($role ?? '') === 'industry_sv' ? 'active' : '' }}">
+                <div class="fw-bold fs-5">Industry Supervisor</div>
+                <div class="fs-4">{{ $counts['industry_sv'] }}</div>
+            </a>
+            <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="filter-card card-modern card-admin {{ ($role ?? '') === 'admin' ? 'active' : '' }}">
+                <div class="fw-bold fs-5">Admin</div>
+                <div class="fs-4">{{ $counts['admin'] }}</div>
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="card-modern p-4 mb-4">
     <div class="d-flex mb-3 align-items-center">
-        <form class="me-2 flex-grow-1" method="GET" action="{{ route('admin.users.index') }}">
-            <input type="text" name="search" class="form-control" placeholder="Search Bar" value="{{ $search ?? '' }}">
+        <form class="me-2 flex-grow-1 d-flex" method="GET" action="{{ route('admin.users.index') }}">
+            <input type="hidden" name="role" value="{{ $role ?? 'all' }}">
+            <input type="text" name="search" class="form-control" placeholder="Search by name or email" value="{{ $search ?? '' }}">
+            <button type="submit" class="btn btn-search ms-2">
+                <i class="bi bi-search" style="color: #111;"></i>
+            </button>
         </form>
         <button class="btn btn-indigo" data-bs-toggle="modal" data-bs-target="#addUserModal">
             <i class="bi bi-person-plus"></i> Add User
         </button>
     </div>
+
+<div class="card-modern p-4 mb-4">
     <table class="table align-middle mb-0" style="border-radius:18px; overflow:hidden;">
-        <thead style="background:#f3f4f6;">
+        <thead class="custom-thead">
             <tr>
                 <th>Name</th>
                 <th>Role</th>
@@ -36,16 +69,16 @@
                 <td>{{ ucfirst($user->role) }}</td>
                 <td>{{ $user->email }}</td>
                 <td>
-                    <button class="btn btn-outline-primary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
+                    <button class="btn btn-outline-purple btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
                         <i class="bi bi-eye"></i>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                    <button class="btn btn-outline-yellow btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ route('admin.users.destroy', $user) }}" style="display:inline;">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="return confirm('Delete this user?')">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" onclick="showDeleteModal('{{ route('admin.users.destroy', $user) }}')">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
@@ -143,6 +176,29 @@
 </div>
 @endforeach
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-modern p-3">
+            <div class="modal-header" style="border-bottom: none;">
+                <h4 class="modal-title w-100 text-center" id="deleteConfirmModalLabel" style="font-weight: bold; color:#e11d48;">Confirm Deletion</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Are you sure you want to delete this user?</p>
+            </div>
+            <div class="modal-footer" style="border-top: none; justify-content: center;">
+                <form id="deleteUserForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger px-4" style="font-weight: bold;">Delete</button>
+                    <button type="button" class="btn btn-secondary px-4 ms-2" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Add User Modal -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -192,8 +248,140 @@
     transition: background 0.2s;
 }
 .btn-indigo:hover { background: #4F46E5; }
+.btn-outline-purple {
+    color: #6366F1 !important;
+    border: 1.5px solid #6366F1;
+    background: transparent;
+}
+.btn-outline-purple:hover, .btn-outline-purple:focus {
+    background: #6366F1;
+    color: #fff !important;
+}
+.btn-outline-yellow {
+    color: #FACC15 !important;
+    border: 1.5px solid #FACC15;
+    background: transparent;
+}
+.btn-outline-yellow:hover, .btn-outline-yellow:focus {
+    background: #FACC15;
+    color: #fff !important;
+}
+/* Make thead background dark and text white */
+table thead.custom-thead, 
+table thead.custom-thead tr, 
+table thead.custom-thead th {
+    background: #0F172A !important;
+}
+table thead.custom-thead th {
+    color: #fff !important;
+}
 .form-label { font-weight: bold; }
 .table th, .table td { vertical-align: middle; }
+.filter-card {
+    min-width: 170px;
+    max-width: 170px;
+    min-height: 90px;
+    max-height: 90px;
+    border-radius: 22px;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: border 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+    text-decoration: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.06);
+    text-align: center; /* <-- Add this line */
+}
+.filter-card .fw-bold {
+    text-decoration: none !important;
+}
+.card-all {
+    background: #0F172A10;
+    color: #0F172A;
+    border-color: #0F172A;
+}
+.card-student {
+    background: #f0fdf4;
+    color: #22c55e;
+    border-color: #22c55e;
+}
+.card-university {
+    background: #f0f9ff;
+    color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+.card-industry {
+    background: #fefce8;
+    color: #eab308;
+    border-color: #eab308;
+}
+.card-admin {
+    background: #ede9fe;
+    color: #6366F1;
+    border-color: #6366F1;
+}
+.filter-card.active.card-all,
+.filter-card:hover.card-all {
+    background: #0F172A !important;
+    color: #fff !important;
+}
+.filter-card.active.card-student,
+.filter-card:hover.card-student {
+    background: #22c55e !important;
+    color: #fff !important;
+}
+.filter-card.active.card-university,
+.filter-card:hover.card-university {
+    background: #0ea5e9 !important;
+    color: #fff !important;
+}
+.filter-card.active.card-industry,
+.filter-card:hover.card-industry {
+    background: #eab308 !important;
+    color: #fff !important;
+}
+.filter-card.active.card-admin,
+.filter-card:hover.card-admin {
+    background: #6366F1 !important;
+    color: #fff !important;
+}
+.btn-search {
+    background: #fde047;
+    color: #111 !important;
+    border-radius: 999px;
+    font-weight: 600;
+    border: none;
+    transition: background 0.2s;
+    padding: 0.5rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-search:hover, .btn-search:focus {
+    background: #facc15;
+    color: #111 !important;
+}
+.btn-search i {
+    color: #111 !important;
+    font-size: 1.2rem;
+}
+.cards-row-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 8px;
+}
+.cards-row-scroll::-webkit-scrollbar {
+    height: 6px;
+    background: #eee;
+}
+.cards-row-scroll::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+}
 </style>
 @endpush
 
@@ -290,6 +478,13 @@
             target.innerHTML = html;
         });
     });
+
+    function showDeleteModal(actionUrl) {
+    const form = document.getElementById('deleteUserForm');
+    form.action = actionUrl;
+    var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    modal.show();
+}
 </script>
 @endpush
 @endsection
