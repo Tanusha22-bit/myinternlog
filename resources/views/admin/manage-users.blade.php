@@ -12,8 +12,8 @@
 @endif
 
 <div class="row mb-4">
-    <div class="col d-flex justify-content-center">
-        <div class="d-flex gap-3 justify-content-center flex-nowrap">
+    <div class="col">
+        <div class="d-flex gap-3 justify-content-center flex-nowrap cards-row-scroll">
             <a href="{{ route('admin.users.index', ['role' => 'all']) }}" class="filter-card card-modern card-all {{ ($role ?? 'all') === 'all' ? 'active' : '' }}">
                 <div class="fw-bold fs-5">All</div>
                 <div class="fs-4">{{ $counts['all'] }}</div>
@@ -39,20 +39,21 @@
 </div>
 
 <div class="card-modern p-4 mb-4">
-    <div class="d-flex mb-3 align-items-center">
-        <form class="me-2 flex-grow-1 d-flex" method="GET" action="{{ route('admin.users.index') }}">
+    <div class="d-flex flex-column flex-md-row mb-3 align-items-stretch align-items-md-center">
+    <form class="me-2 flex-grow-1 d-flex" method="GET" action="{{ route('admin.users.index') }}">
             <input type="hidden" name="role" value="{{ $role ?? 'all' }}">
             <input type="text" name="search" class="form-control" placeholder="Search by name or email" value="{{ $search ?? '' }}">
             <button type="submit" class="btn btn-search ms-2">
                 <i class="bi bi-search" style="color: #111;"></i>
             </button>
         </form>
-        <button class="btn btn-indigo" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <button class="btn btn-indigo mt-2 mt-md-0" data-bs-toggle="modal" data-bs-target="#addUserModal">
             <i class="bi bi-person-plus"></i> Add User
         </button>
     </div>
 
 <div class="card-modern p-4 mb-4">
+    <div class="table-responsive">
     <table class="table align-middle mb-0" style="border-radius:18px; overflow:hidden;">
         <thead class="custom-thead">
             <tr>
@@ -90,6 +91,7 @@
     <div class="mt-3">
         {{ $users->links() }}
     </div>
+</div>
 </div>
 
 <!-- Modals Section (outside table for proper functionality) -->

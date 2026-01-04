@@ -108,6 +108,31 @@ table thead.custom-thead th {
     color: #fff !important;
 }
 .table th, .table td { vertical-align: middle; }
+.cards-row-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 8px;
+}
+.cards-row-scroll::-webkit-scrollbar {
+    height: 6px;
+    background: #eee;
+}
+.cards-row-scroll::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+}
+@media (max-width: 575.98px) {
+    .filter-card {
+        min-width: 120px;
+        max-width: 120px;
+        font-size: 0.98rem;
+        padding: 0.1rem 0.1rem;
+    }
+    .card-modern {
+        padding: 1rem !important;
+    }
+}
 </style>
 @endpush
 
@@ -120,7 +145,7 @@ table thead.custom-thead th {
 @endif
 
 {{-- Row 1: Centered Cards --}}
-<div class="d-flex justify-content-center gap-3 mb-3">
+<div class="d-flex gap-3 mb-3 justify-content-center flex-wrap flex-md-nowrap cards-row-scroll">
     <a href="{{ route('admin.communications.index', ['tab' => 'announcement', 'role' => $role]) }}"
        class="filter-card {{ $tab === 'announcement' ? 'active card-all' : 'card-all' }}">
         <div class="fw-bold">Announcements</div>
@@ -132,8 +157,8 @@ table thead.custom-thead th {
 </div>
 
 {{-- Row 2: Centered Search Bar and Add Button --}}
-<div class="d-flex justify-content-between align-items-center mb-4" style="max-width:600px;margin:0 auto;">
-    <form method="GET" action="{{ route('admin.communications.index') }}" class="d-flex gap-2 align-items-center">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center mb-4" style="max-width:600px;margin:0 auto;">
+    <form method="GET" action="{{ route('admin.communications.index') }}" class="d-flex gap-2 align-items-center flex-grow-1 mb-2 mb-sm-0">
         <input type="hidden" name="tab" value="{{ $tab }}">
         <select name="role" class="form-select" style="max-width:180px;">
             <option value="all" {{ $role === 'all' ? 'selected' : '' }}>All Roles</option>
@@ -146,11 +171,11 @@ table thead.custom-thead th {
     </form>
     <div>
         @if($tab === 'announcement')
-            <button class="btn btn-indigo" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
+            <button class="btn btn-indigo w-100 mt-2 mt-sm-0" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
                 <i class="bi bi-plus"></i> Add Announcement
             </button>
         @else
-            <button class="btn btn-indigo" data-bs-toggle="modal" data-bs-target="#addDateModal">
+            <button class="btn btn-indigo w-100 mt-2 mt-sm-0" data-bs-toggle="modal" data-bs-target="#addDateModal">
                 <i class="bi bi-plus"></i> Add Important Date
             </button>
         @endif
@@ -236,7 +261,7 @@ table thead.custom-thead th {
 
 {{-- Add Announcement Modal --}}
 <div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <form class="modal-content" method="POST" action="{{ route('admin.communications.announcement.store') }}">
             @csrf
             <div class="modal-header">

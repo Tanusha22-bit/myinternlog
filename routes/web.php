@@ -9,6 +9,7 @@ use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\InternshipController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\IndustryReportController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\IndustrySupervisorStudentController;
 use App\Http\Controllers\UniversitySupervisorStudentController;
 use App\Http\Controllers\UniversitySupervisorProfileController;
@@ -31,7 +32,7 @@ Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('st
 Route::get('/dashboard/industry', fn() => view('dashboards.industry'))->middleware('auth');
 Route::get('/dashboard/university', [UniversitySupervisorDashboardController::class, 'index'])->middleware('auth');
 //Route::get('/dashboard/university', fn() => view('dashboards.university'))->middleware('auth');
-Route::get('/dashboard/admin', fn() => view('dashboards.admin'))->middleware('auth');
+//Route::get('/dashboard/admin', fn() => view('dashboards.admin'))->middleware('auth');
 
 //Routes for Daily Report
 Route::middleware(['auth', 'ensure.student.profile'])->group(function () {
@@ -106,9 +107,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/industry/profile/password', [App\Http\Controllers\IndustryProfileController::class, 'updatePassword'])->name('industry.profile.password');
 });
 
+    Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])->middleware('auth');
 //Route for admin manage accounts
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', fn() => view('dashboards.admin'))->name('admin.dashboard');
     Route::get('users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::post('users', [AdminUserController::class, 'store'])->name('admin.users.store');
     Route::put('users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
@@ -126,6 +127,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('communications/date', [App\Http\Controllers\AdminCommunicationController::class, 'storeDate'])->name('admin.communications.date.store');
     Route::put('communications/date/{date}', [App\Http\Controllers\AdminCommunicationController::class, 'updateDate'])->name('admin.communications.date.update');
     Route::delete('communications/date/{date}', [App\Http\Controllers\AdminCommunicationController::class, 'destroyDate'])->name('admin.communications.date.destroy');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/download/assignments-csv', [AdminDashboardController::class, 'downloadAssignmentsCsv'])->name('admin.download.assignments.csv');
+    Route::get('/download/analytics-csv', [AdminDashboardController::class, 'downloadAnalyticsCsv'])->name('admin.download.analytics.csv');
+    Route::get('/admin/assign-supervisor/{student}/edit', [AdminUserController::class, 'editAssignment'])->name('admin.assign-supervisor.edit');
 });
 
 

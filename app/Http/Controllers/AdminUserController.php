@@ -132,19 +132,54 @@ class AdminUserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
     }
 
-    public function assignSupervisorPage()
-    {
-        $students = User::where('role', 'student')
-            ->with([
-                'student.internship.industrySupervisor.user',
-                'student.internship.universitySupervisor.user'
-            ])
-            ->get();
-        $industrySupervisors = User::where('role', 'industry_sv')->with('industrySupervisor')->get();
-        $universitySupervisors = User::where('role', 'university_sv')->with('universitySupervisor')->get();
+public function assignSupervisorPage(Request $request)
+{
+    $search = $request->input('search');
+    $status = $request->input('status');
 
-        return view('admin.assign-supervisor', compact('students', 'industrySupervisors', 'universitySupervisors'));
+    $studentsQuery = User::where('role', 'student')
+        ->with([
+            'student.internship.industrySupervisor.user',
+            'student.internship.universitySupervisor.user'
+        ]);
+
+    if ($search) {
+        $studentsQuery->where(function ($query) use ($search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhereHas('student', function ($q) use ($search) {
+                    $q->where('student_id', 'like', "%$search%");
+                })
+                ->orWhereHas('student.internship.industrySupervisor.user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                })
+                ->orWhereHas('student.internship.universitySupervisor.user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                });
+        });
     }
+
+    if ($status && in_array($status, ['active', 'completed', 'terminated'])) {
+        $studentsQuery->whereHas('student.internship', function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
+
+    $students = $studentsQuery->get();
+
+    // Counts for cards
+    $allCount = User::where('role', 'student')->count();
+    $activeCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'active'); })->count();
+    $completedCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'completed'); })->count();
+    $terminatedCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'terminated'); })->count();
+
+    $industrySupervisors = User::where('role', 'industry_sv')->with('industrySupervisor')->get();
+    $universitySupervisors = User::where('role', 'university_sv')->with('universitySupervisor')->get();
+
+    return view('admin.assign-supervisor', compact(
+        'students', 'industrySupervisors', 'universitySupervisors', 'search', 'status',
+        'allCount', 'activeCount', 'completedCount', 'terminatedCount'
+    ));
+}
 
     public function storeAssignment(Request $request)
     {
@@ -194,5 +229,20 @@ class AdminUserController extends Controller
             'status',
         ]));
         return back()->with('success', 'Assignment updated successfully!');
+    }
+
+    public function editAssignment($studentId)
+    {
+    $student = User::where('role', 'student')
+        ->with([
+            'student.internship.industrySupervisor.user',
+            'student.internship.universitySupervisor.user'
+        ])
+        ->findOrFail($studentId);
+
+    $industrySupervisors = User::where('role', 'industry_sv')->with('industrySupervisor')->get();
+    $universitySupervisors = User::where('role', 'university_sv')->with('universitySupervisor')->get();
+
+    return view('admin.edit-assignment', compact('student', 'industrySupervisors', 'universitySupervisors'));
     }
 }

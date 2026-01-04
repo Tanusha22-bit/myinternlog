@@ -5,15 +5,39 @@
 
 @section('content')
 @if(session('success'))
-    <div id="successDialog" class="custom-success-dialog">
-        <div class="dialog-content">
-            <p>{{ session('success') }}</p>
-            <button class="ok-btn" onclick="document.getElementById('successDialog').style.display='none'">OK</button>
-        </div>
-    </div>
+    <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
+<div class="d-flex gap-3 mb-4 justify-content-center flex-wrap flex-md-nowrap cards-row-scroll">
+    <a href="{{ route('admin.assign-supervisor') }}"
+       class="filter-card status-all {{ !$status ? 'active' : '' }}">
+        <div class="fw-bold">All</div>
+        <div class="filter-count">{{ $allCount }}</div>
+    </a>
+    <a href="{{ route('admin.assign-supervisor', ['status' => 'active']) }}"
+       class="filter-card status-active {{ $status == 'active' ? 'active' : '' }}">
+        <div class="fw-bold">Active</div>
+        <div class="filter-count">{{ $activeCount }}</div>
+    </a>
+    <a href="{{ route('admin.assign-supervisor', ['status' => 'completed']) }}"
+       class="filter-card status-completed {{ $status == 'completed' ? 'active' : '' }}">
+        <div class="fw-bold">Completed</div>
+        <div class="filter-count">{{ $completedCount }}</div>
+    </a>
+    <a href="{{ route('admin.assign-supervisor', ['status' => 'terminated']) }}"
+       class="filter-card status-terminated {{ $status == 'terminated' ? 'active' : '' }}">
+        <div class="fw-bold">Terminated</div>
+        <div class="filter-count">{{ $terminatedCount }}</div>
+    </a>
+</div>
+
+<form method="GET" class="mb-3 d-flex flex-column flex-sm-row gap-2" action="{{ route('admin.assign-supervisor') }}">
+    <input type="text" name="search" class="form-control" placeholder="Search by name, matric ID, or supervisor" value="{{ $search ?? '' }}">
+    <button class="btn btn-indigo" type="submit">Search</button>
+</form>
+
 <div class="card-modern p-4 mb-4">
+    <div class="table-responsive">
     <table class="table align-middle mb-0" style="border-radius:18px; overflow:hidden;">
         <thead style="background:#f3f4f6;">
             <tr>
@@ -48,14 +72,15 @@
                     @endif
                 </td>
                 <td>
-                    <button class="btn btn-indigo btn-sm px-3" data-bs-toggle="modal" data-bs-target="#viewEditModal{{ $student->id }}">
-                        <i class="bi bi-pencil-square"></i> View/Edit
-                    </button>
+                    <a href="{{ route('admin.assign-supervisor.edit', $student->id) }}" class="btn btn-indigo btn-sm px-3">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
                 </td>
             </tr>
             @endforeach
         </tbody>
     </table>
+</div>
 </div>
 
 <!-- All modals OUTSIDE the table -->
@@ -188,6 +213,97 @@
     font-size: 1.2rem;
     margin-top: 24px;
     font-weight: bold;
+}
+.filter-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    min-height: 80px;
+    background: #fff;
+    border-radius: 24px;
+    text-decoration: none;
+    color: #222;
+    border: 3px solid transparent;
+    transition: border 0.2s, background 0.2s, color 0.2s;
+    font-size: 1.1rem;
+}
+.filter-card .filter-count {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 2px;
+}
+.status-all {
+    border-color: #181e2a;
+    color: #181e2a;
+}
+.status-active {
+    border-color: #22c55e;
+    color: #22c55e;
+}
+.status-completed {
+    border-color: #2196f3;
+    color: #2196f3;
+}
+.status-terminated {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+.status-all.active, .status-all:hover {
+    background: #181e2a !important;
+    color: #fff !important;
+}
+.status-all.active .fw-bold, .status-all.active .filter-count,
+.status-all:hover .fw-bold, .status-all:hover .filter-count {
+    color: #fff !important;
+}
+.status-active.active, .status-active:hover {
+    background: #22c55e !important;
+    color: #fff !important;
+}
+.status-active.active .fw-bold, .status-active.active .filter-count,
+.status-active:hover .fw-bold, .status-active:hover .filter-count {
+    color: #fff !important;
+}
+.status-completed.active, .status-completed:hover {
+    background: #2196f3 !important;
+    color: #fff !important;
+}
+.status-completed.active .fw-bold, .status-completed.active .filter-count,
+.status-completed:hover .fw-bold, .status-completed:hover .filter-count {
+    color: #fff !important;
+}
+.status-terminated.active, .status-terminated:hover {
+    background: #ef4444 !important;
+    color: #fff !important;
+}
+.status-terminated.active .fw-bold, .status-terminated.active .filter-count,
+.status-terminated:hover .fw-bold, .status-terminated:hover .filter-count {
+    color: #fff !important;
+}
+.status-active:not(.active):not(:hover) {
+    background: #f6fffa;
+}
+.status-completed:not(.active):not(:hover) {
+    background: #f6fbff;
+}
+.status-terminated:not(.active):not(:hover) {
+    background: #fff6f6;
+}
+.cards-row-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    padding-bottom: 8px;
+}
+.cards-row-scroll::-webkit-scrollbar {
+    height: 6px;
+    background: #eee;
+}
+.cards-row-scroll::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
 }
 </style>
 @endsection
