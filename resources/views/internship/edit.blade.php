@@ -18,13 +18,14 @@
 </style>
 @endsection
 
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-pencil-square me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Edit<span style="color:#6366F1;">Internship</span></span>
+    </h2>
+@endsection
+
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Edit<span class="brand-highlight">Internship</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-    </div>
-</div>
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif

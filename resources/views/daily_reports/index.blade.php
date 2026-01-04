@@ -73,15 +73,14 @@
 @endsection
 
 @section('title', 'Report List')
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-list-check me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Report<span style="color:#6366F1;">List</span></span>
+    </h2>
+@endsection
 
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Report<span class="brand-highlight">List</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-    </div>
-</div>
-
 <div class="row g-3 mb-4 justify-content-center">
     <div class="col-md-3">
         <a href="{{ route('daily-report.list') }}"

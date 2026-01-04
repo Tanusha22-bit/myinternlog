@@ -1,4 +1,3 @@
-<!-- filepath: resources/views/layouts/student-dashboard.blade.php -->
 <!DOCTYPE html>
 <html lang="en" class="{{ session('theme','light') === 'dark' ? 'theme-dark' : 'theme-light' }}">
 <head>
@@ -22,14 +21,20 @@
         }
         body { background: var(--bg-main); }
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 100;
             background: var(--sidebar);
             color: #fff;
-            min-height: 100vh;
+            width: 260px;
+            min-width: 260px;
             padding: 24px 0 24px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            border-radius: 0 20px 20px 0; /* Only round right side */
+            border-radius: 0 20px 20px 0;
             box-shadow: 2px 0 16px rgba(99,102,241,0.04);
         }
         .sidebar .logo-img { height: 44px; margin-bottom: 18px; }
@@ -46,20 +51,20 @@
             transition: background 0.2s, color 0.2s;
         }
         .sidebar .nav-link.active {
-    background: rgba(251,191,36,0.18); /* lighter amber background */
-    color: var(--accent);
-    border-left: 5px solid var(--accent);
-    font-weight: 600;
-}
-.sidebar .nav-link:hover:not(.active) {
-    background: rgba(251,191,36,0.10);
-    color: var(--accent);
-}
-.sidebar .nav-link:active,
-.sidebar .nav-link:focus {
-    background: rgba(251,191,36,0.10); /* subtle amber on click/focus */
-    color: var(--accent);
-}
+            background: rgba(251,191,36,0.18);
+            color: var(--accent);
+            border-left: 5px solid var(--accent);
+            font-weight: 600;
+        }
+        .sidebar .nav-link:hover:not(.active) {
+            background: rgba(251,191,36,0.10);
+            color: var(--accent);
+        }
+        .sidebar .nav-link:active,
+        .sidebar .nav-link:focus {
+            background: rgba(251,191,36,0.10);
+            color: var(--accent);
+        }
         .logout-btn {
             background: var(--accent);
             color: var(--text-primary);
@@ -73,9 +78,6 @@
             transition: background 0.2s;
         }
         .logout-btn:hover { background: #67e8f9; }
-        .dashboard-content {
-            padding: 40px 32px;
-        }
         .brand-highlight { color: var(--primary); }
         .avatar {
             background: var(--accent);
@@ -107,57 +109,147 @@
             display: block;
         }
         .quick-link:hover { background: var(--primary-hover); color: #fff; }
+        .dashboard-content {
+            padding: 40px 32px;
+            margin-left: 260px;
+        }
         @media (max-width: 991.98px) {
-            .sidebar { border-radius: 0; min-height: auto; flex-direction: row; padding: 16px; }
-            .dashboard-content { padding: 16px; }
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                width: 260px;
+                min-width: 260px;
+                height: 100vh;
+                z-index: 300;
+                transition: left 0.3s;
+                border-radius: 0 20px 20px 0;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.25);
+                z-index: 250;
+            }
+            .sidebar.show ~ .sidebar-overlay {
+                display: block;
+            }
+            .dashboard-content {
+                padding: 16px;
+                margin-left: 0;
+            }
         }
         @media (max-width: 767.98px) {
-            .sidebar { flex-direction: row; align-items: flex-start; padding: 8px; }
             .dashboard-content { padding: 8px; }
+            .sidebar { border-radius: 0; }
+        }
+        .logout-btn {
+            background: transparent;
+            color: #fff;
+            font-size: 1.08rem;
+            padding: 10px 24px;
+            border-radius: 999px;
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: 16px;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .logout-btn:hover {
+            background: #ef4444;
+            color: #fff;
         }
     </style>
    @yield('styles')
 </head>
 <body class="{{ session('theme','light') === 'dark' ? 'dark-mode' : '' }}">
-<div class="container-fluid">
-    <div class="row g-0">
-        <!-- Sidebar -->
-        <div class="col-lg-3 col-md-4 sidebar">
-            <img src="{{ asset('images/myinternlog-logo.png') }}" alt="Logo" class="logo-img">
-            <div class="welcome mb-3">Welcome, <br>{{ auth()->user()->name ?? 'Name' }}!</div>
-            <nav class="flex-grow-1 w-100">
-    <a href="{{ url('/dashboard') }}" class="nav-link{{ request()->is('dashboard') ? ' active' : '' }}">
-    <i class="bi bi-house-door-fill"></i> Home
-    </a>
-    <a href="{{ route('daily-report.create') }}" class="nav-link{{ request()->routeIs('daily-report.create') ? ' active' : '' }}">
-        <i class="bi bi-journal-text"></i>Daily Report
-    </a>
-    <a href="{{ route('daily-report.list') }}" class="nav-link{{ request()->routeIs('daily-report.list') ? ' active' : '' }}">
-        <i class="bi bi-list-check"></i>Report List
-    </a>
-    <a href="{{ route('tasks.index') }}" class="nav-link{{ request()->routeIs('tasks.*') ? ' active' : '' }}">
-        <i class="bi bi-check2-square"></i>Task
-    </a>
-    <a href="{{ route('internship.show', auth()->user()->student->internship->id ?? 1) }}" class="nav-link{{ request()->routeIs('internship.*') ? ' active' : '' }}">
-    <i class="bi bi-briefcase"></i>Internship Detail
-    </a>
-    <a href="{{ route('profile.show') }}" class="nav-link{{ request()->routeIs('profile.*') ? ' active' : '' }}">
-        <i class="bi bi-person"></i>Profile
-    </a>
-     <form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent" style="color: #fff;">
-        <i class="bi bi-box-arrow-right"></i> Logout
+    <!-- Mobile Menu Button -->
+    <button class="btn btn-primary d-lg-none position-fixed" id="sidebarToggle"
+            style="top:18px;left:18px;z-index:200;">
+        <i class="bi bi-list" style="font-size:1.5rem;"></i>
     </button>
-</form>
-</nav>
-        </div>
-        <!-- Main Content -->
-        <div class="col-lg-9 col-md-8 dashboard-content">
-            @yield('content')
-        </div>
+    <div class="sidebar">
+        <img src="{{ asset('images/myinternlog-logo.png') }}" alt="Logo" class="logo-img">
+        <div class="welcome mb-3">Welcome, <br>{{ auth()->user()->name ?? 'Name' }}!</div>
+        <nav class="flex-grow-1 w-100">
+            <a href="{{ url('/dashboard') }}" class="nav-link{{ request()->is('dashboard') ? ' active' : '' }}">
+                <i class="bi bi-house-door-fill"></i> Home
+            </a>
+            <a href="{{ route('daily-report.create') }}" class="nav-link{{ request()->routeIs('daily-report.create') ? ' active' : '' }}">
+                <i class="bi bi-journal-text"></i>Daily Report
+            </a>
+            <a href="{{ route('daily-report.list') }}" class="nav-link{{ request()->routeIs('daily-report.list') ? ' active' : '' }}">
+                <i class="bi bi-list-check"></i>Report List
+            </a>
+            <a href="{{ route('tasks.index') }}" class="nav-link{{ request()->routeIs('tasks.*') ? ' active' : '' }}">
+                <i class="bi bi-check2-square"></i>Task
+            </a>
+            <a href="{{ route('internship.show', auth()->user()->student->internship->id ?? 1) }}" class="nav-link{{ request()->routeIs('internship.*') ? ' active' : '' }}">
+                <i class="bi bi-briefcase"></i>Internship Detail
+            </a>
+            <a href="{{ route('profile.show') }}" class="nav-link{{ request()->routeIs('profile.*') ? ' active' : '' }}">
+                <i class="bi bi-person"></i>Profile
+            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
+        </nav>
+    </div>
+    <div class="sidebar-overlay d-lg-none"></div>
+    <div class="d-flex align-items-center justify-content-between px-4 py-3"
+     style="background: #f7f8fa; border-bottom: 1px solid #eee; margin-left:260px;">
+    <div>
+        @yield('page-title')
+    </div>
+    <div class="d-flex align-items-center">
+        <span class="me-3 fw-semibold" style="font-size:1.1rem;">
+            {{ auth()->user()->name ?? 'User' }}
+        </span>
+        <img src="{{ auth()->user()->profile_pic ? asset('storage/' . auth()->user()->profile_pic) : asset('images/default-avatar.png') }}"
+             alt="Profile Picture"
+             class="rounded-circle"
+             style="width:44px; height:44px; object-fit:cover; border:2px solid #6366F1;">
     </div>
 </div>
-@stack('scripts')
+    <div class="dashboard-content">
+        @yield('content')
+    </div>
+    @stack('scripts')
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        if(toggleBtn && sidebar && overlay) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            });
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
+    });
+    </script>
+    <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2026/01/04/14/20260104145909-PNU329RH.js" defer>
+        window.botpressWebChat.init({
+            // ...your other config...
+            stylesheet: "/css/botpress-custom.css"
+        });
+    </script>
 </body>
 </html>

@@ -97,21 +97,52 @@
             background: var(--bg-card);
         }
         @media (max-width: 991.98px) {
-            .sidebar { border-radius: 0; min-height: auto; flex-direction: row; padding: 16px; width: 100px; min-width: 100px; }
-            .dashboard-content { padding: 16px; margin-left: 100px; }
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                width: 260px;
+                min-width: 260px;
+                height: 100vh;
+                z-index: 300;
+                transition: left 0.3s;
+                border-radius: 0 20px 20px 0;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.25);
+                z-index: 250;
+            }
+            .sidebar.show ~ .sidebar-overlay {
+                display: block;
+            }
+            .dashboard-content {
+                padding: 16px;
+                margin-left: 0;
+            }
         }
         @media (max-width: 767.98px) {
-            .sidebar { flex-direction: row; align-items: flex-start; padding: 8px; width: 70px; min-width: 70px; }
-            .dashboard-content { padding: 8px; margin-left: 70px; }
+            .sidebar { border-radius: 0; }
+            .dashboard-content { padding: 8px; }
         }
     </style>
     @yield('styles')
 </head>
 <body>
+    <!-- Mobile Menu Button -->
+    <button class="btn btn-primary d-lg-none position-fixed" id="sidebarToggle"
+            style="top:18px;left:18px;z-index:200;">
+        <i class="bi bi-list" style="font-size:1.5rem;"></i>
+    </button>
     <div class="sidebar">
         <img src="{{ asset('images/myinternlog-logo.png') }}" alt="Logo" class="logo-img">
         <div class="welcome mb-4 text-center w-100" style="font-weight:600;">
-            Welcome Name!
+            Welcome, {{ Auth::user()->name ?? 'Name' }}!
         </div>
         <nav class="flex-grow-1 w-100">
             <a href="{{ url('/dashboard/industry') }}" class="nav-link{{ request()->is('dashboard/industry') ? ' active' : '' }}">
@@ -137,6 +168,7 @@
             </form>
         </nav>
     </div>
+    <div class="sidebar-overlay d-lg-none"></div>
     <div class="dashboard-content">
         <!-- Header Row: Page Title (left) & User Info (right) -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -166,5 +198,29 @@
         @yield('content')
     </div>
     @stack('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        if(toggleBtn && sidebar && overlay) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            });
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
+    });
+    </script>
+    <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2026/01/04/14/20260104145909-PNU329RH.js" defer>
+          window.botpressWebChat.init({
+            // ...your other config...
+            stylesheet: "/css/botpress-custom.css"
+        });
+    </script>
 </body>
 </html>

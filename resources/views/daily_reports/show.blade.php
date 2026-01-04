@@ -47,14 +47,14 @@
 @endsection
 
 @section('title', 'Report Detail')
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-file-earmark-text me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Report<span style="color:#6366F1;">Detail</span></span>
+    </h2>
+@endsection
 
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Report<span class="brand-highlight">Detail</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-    </div>
-</div>
 <div class="card card-modern p-4 mb-3">
     <div class="mb-2"><strong>Date:</strong> {{ \Carbon\Carbon::parse($report->report_date)->format('d M Y') }}</div>
     <div class="mb-3">

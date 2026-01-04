@@ -48,16 +48,14 @@
 @endsection
 
 @section('title', 'Daily Report')
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-journal-text me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Daily<span style="color:#6366F1;">Log</span></span>
+    </h2>
+@endsection
 
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Daily<span class="brand-highlight">Log</span></h2>
-    <div class="d-flex align-items-center ms-3">
-        <div class="avatar me-2">
-            {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-        </div>
-    </div>
-</div>
 
 <div class="row g-4 mb-4">
     <!-- Today's Log Status Card -->
@@ -99,36 +97,6 @@
         </div>
     </div>
 </div>
-
-<!-- Popup Message for Success or Errors -->
-@if(session('success') || $errors->any())
-<div id="popupMessage" style="
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 32px rgba(99,102,241,0.12);
-    padding: 2rem 2.5rem;
-    z-index: 9999;
-    text-align: center;
-    min-width: 300px;
-">
-    <div style="font-size:1.3rem; margin-bottom:1rem;">
-        @if(session('success'))
-            {{ session('success') }}
-        @else
-            @foreach($errors->all() as $error)
-                {{ $error }}<br>
-            @endforeach
-        @endif
-    </div>
-    <button onclick="document.getElementById('popupMessage').style.display='none';"
-        style="background:#FBBF24; color:#222; border:none; border-radius:8px; font-size:1.1rem; padding:0.5rem 2rem; font-weight:500; cursor:pointer;">
-        OK
-    </button>
-</div>
-@endif
 
 <!-- Daily Report Form -->
 <div class="row justify-content-center">

@@ -40,11 +40,14 @@
 @endsection
 
 @section('title', 'Edit Report')
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi bi-list-check me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Edit<span style="color:#6366F1;">Report</span></span>
+    </h2>
+@endsection
 
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Edit<span class="brand-highlight">Report</span></h2>
-</div>
 <div class="card card-modern p-4 mb-3">
     <form method="POST" action="{{ route('daily-report.update', $report->id) }}" enctype="multipart/form-data">
     @csrf

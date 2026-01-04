@@ -49,10 +49,14 @@
 </style>
 @endsection
 
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-briefcase me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Internship<span style="color:#6366F1;">Detail</span></span>
+    </h2>
+@endsection
+
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0"><i class="bi bi-briefcase"></i> Internship <span class="brand-highlight">Detail</span></h2>
-</div>
 <div class="card card-modern p-4">
     <div class="detail-row"><i class="bi bi-info-circle"></i> <span class="detail-label">Status:</span>&nbsp; {{ ucfirst($internship->status) }}</div>
     <div class="detail-row"><i class="bi bi-building"></i> <span class="detail-label">Company:</span>&nbsp; {{ $internship->company_name }}</div>

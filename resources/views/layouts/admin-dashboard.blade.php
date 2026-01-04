@@ -218,5 +218,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2026/01/04/14/20260104145909-PNU329RH.js" defer>
+          window.botpressWebChat.init({
+            // ...your other config...
+            stylesheet: "/css/botpress-custom.css"
+        });
+    </script>
 </body>
 </html>

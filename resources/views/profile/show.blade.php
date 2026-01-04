@@ -48,14 +48,14 @@
 }
 </style>
 @endsection
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi bi-person me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">My<span style="color:#6366F1;">Profile</span></span>
+    </h2>
+@endsection
 
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">My<span class="brand-highlight">Profile</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-    </div>
-</div>
 @if(session('info'))
     <div class="alert alert-info">{{ session('info') }}</div>
 @endif

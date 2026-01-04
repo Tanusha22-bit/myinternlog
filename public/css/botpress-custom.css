@@ -1,0 +1,15 @@
+/* Change the main color of the chat widget */
+.bpw-floating-button,
+.bpw-header,
+.bpw-send-button,
+.bpw-bot-avatar,
+.bpw-user-avatar {
+    background-color: #0F172A !important;
+    border-color: #0F172A !important;
+}
+.bpw-floating-button svg {
+    fill: #fff !important;
+}
+.bpw-header-title {
+    color: #fff !important;
+}

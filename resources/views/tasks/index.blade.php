@@ -79,13 +79,14 @@
 </style>
 @endsection
 
+@section('page-title')
+    <h2 class="mb-0">
+        <i class="bi-list-task me-2" style="color:#6366F1; font-size:2rem; vertical-align:-0.2em;"></i>
+        <span style="font-weight:500;">Task<span style="color:#6366F1;">List</span></span>
+    </h2>
+@endsection
+
 @section('content')
-<div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Task<span class="brand-highlight">List</span></h2>
-    <div class="avatar ms-3">
-        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-    </div>
-</div>
 
 <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
     <a href="{{ route('tasks.index', ['status' => 'all']) }}"

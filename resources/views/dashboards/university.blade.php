@@ -185,7 +185,7 @@
                     <li class="list-group-item">
                         <strong>{{ $announcement->title }}</strong>
                         <div style="font-size:0.95em;">{!! \Illuminate\Support\Str::limit(strip_tags($announcement->content), 60) !!}</div>
-                        <div class="text-muted" style="font-size:0.85em;">{{ $announcement->created_at->format('d M Y') }}</div>
+                        <div class="text-muted" style="font-size:0.85em;">{{ \Carbon\Carbon::parse($announcement->created_at)->format('d M Y') }}</div>
                     </li>
                 @empty
                     <li class="list-group-item text-muted">No announcements.</li>
