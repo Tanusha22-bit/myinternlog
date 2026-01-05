@@ -93,6 +93,10 @@
                     <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Matric Number</label>
+                    <input name="student_id" class="form-control" value="{{ old('student_id', $student->student_id ?? '') }}" required>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Program</label>
                     <input name="program" class="form-control" value="{{ old('program', $student->program ?? '') }}" required>
                 </div>

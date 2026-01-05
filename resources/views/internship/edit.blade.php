@@ -37,7 +37,7 @@
     </div>
 @endif
 <div class="card card-modern p-4">
-    <form method="POST" action="{{ route('internship.update', $internship->id) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('internship.update') }}" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label class="form-label">Company Name</label>
@@ -76,14 +76,14 @@
                 </a>
                 <span class="text-danger ms-2">(Uploading a new file will replace the current one)</span>
             </div>
-        @endif
-        <input type="file" name="offer_letter" accept="application/pdf" class="form-control">
-        <div class="form-text text-danger" style="font-weight:500;">
-            Only PDF allowed. Max size: 10MB.
-        </div>
+            @endif
+            <input type="file" name="offer_letter" accept="application/pdf" class="form-control">
+            <div class="form-text text-danger" style="font-weight:500;">
+                Only PDF allowed. Max size: 10MB.
+            </div>
         </div>
         <button class="btn btn-indigo w-100 mt-3">Update Internship</button>
-        <a href="{{ route('internship.show', $internship->id) }}" class="btn btn-danger w-100 mt-2">Cancel</a>
+        <a href="{{ route('internship.show') }}" class="btn btn-danger w-100 mt-2">Cancel</a>
     </form>
 </div>
 @endsection

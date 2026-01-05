@@ -94,6 +94,7 @@ class ProfileController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
+            'student_id' => 'required|string',
             'program' => 'required|string',
             'semester' => 'required|string',
             'phone' => 'required|string',
@@ -113,6 +114,7 @@ class ProfileController extends Controller
         $user->email = $request->email;
         $user->save();
 
+        $student->student_id = $request->student_id;
         $student->program = $request->program;
         $student->semester = $request->semester;
         $student->phone = $request->phone;

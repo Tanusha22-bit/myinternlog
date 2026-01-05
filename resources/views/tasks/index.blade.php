@@ -6,9 +6,9 @@
 <style>
 .filter-card {
     background: #fff;
-    border-radius: 24px;
+    border-radius: 28px;
     box-shadow: 0 2px 16px rgba(99,102,241,0.08);
-    padding: 1.2rem 2.5rem;
+    padding: 2.2rem 0.5rem 1.2rem 0.5rem;
     font-weight: 600;
     font-size: 1.1rem;
     color: #222;
@@ -16,34 +16,63 @@
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
     border: 2px solid transparent;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
     text-decoration: none !important;
     text-align: center;
-    min-width: 200px;
-    min-height: 70px;
-    margin: 0 8px 16px 8px;
+    width: 180px;
+    height: 140px;
+    min-width: 160px;
+    min-height: 120px;
+    margin: 0 12px 16px 12px;
+}
+.filter-card .filter-count {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #222;
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 0.8rem;
+    line-height: 1;
+    transition: color 0.2s;
 }
 .filter-card.all:hover, .filter-card.all.active {
     background: #6366F1;
     color: #fff;
     border-color: #6366F1;
 }
+.filter-card.all:hover .filter-count,
+.filter-card.all.active .filter-count {
+    color: #fff;
+}
 .filter-card.pending:hover, .filter-card.pending.active {
     background: #FBBF24;
-    color: #222;
+    color: #fff;
     border-color: #FBBF24;
+}
+.filter-card.pending:hover .filter-count,
+.filter-card.pending.active .filter-count {
+    color: #fff;
 }
 .filter-card.in_progress:hover, .filter-card.in_progress.active {
     background: #38BDF8;
     color: #fff;
     border-color: #38BDF8;
 }
+.filter-card.in_progress:hover .filter-count,
+.filter-card.in_progress.active .filter-count {
+    color: #fff;
+}
 .filter-card.completed:hover, .filter-card.completed.active {
     background: #22C55E;
     color: #fff;
     border-color: #22C55E;
+}
+.filter-card.completed:hover .filter-count,
+.filter-card.completed.active .filter-count {
+    color: #fff;
 }
 .table-modern th {
     background: #0F172A;
@@ -91,19 +120,27 @@
 <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
     <a href="{{ route('tasks.index', ['status' => 'all']) }}"
        class="filter-card all{{ empty($activeStatus) || $activeStatus === 'all' ? ' active' : '' }}">
-        <i class="bi bi-collection"></i> All
+        <i class="bi bi-collection mb-1"></i>
+        <span>All</span>
+        <span class="filter-count">{{ $counts['all'] ?? $tasks->count() }}</span>
     </a>
     <a href="{{ route('tasks.index', ['status' => 'pending']) }}"
        class="filter-card pending{{ $activeStatus === 'pending' ? ' active' : '' }}">
-        <i class="bi bi-hourglass-split"></i> Pending
+        <i class="bi bi-hourglass-split mb-1"></i>
+        <span>Pending</span>
+        <span class="filter-count">{{ $counts['pending'] ?? 0 }}</span>
     </a>
     <a href="{{ route('tasks.index', ['status' => 'in_progress']) }}"
        class="filter-card in_progress{{ $activeStatus === 'in_progress' ? ' active' : '' }}">
-        <i class="bi bi-arrow-repeat"></i> In Progress
+        <i class="bi bi-arrow-repeat mb-1"></i>
+        <span>In Progress</span>
+        <span class="filter-count">{{ $counts['in_progress'] ?? 0 }}</span>
     </a>
     <a href="{{ route('tasks.index', ['status' => 'completed']) }}"
        class="filter-card completed{{ $activeStatus === 'completed' ? ' active' : '' }}">
-        <i class="bi bi-check-circle"></i> Completed
+        <i class="bi bi-check-circle mb-1"></i>
+        <span>Completed</span>
+        <span class="filter-count">{{ $counts['completed'] ?? 0 }}</span>
     </a>
 </div>
 

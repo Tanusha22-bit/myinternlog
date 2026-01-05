@@ -58,29 +58,35 @@
 
 @section('content')
 <div class="card card-modern p-4">
-    <div class="detail-row"><i class="bi bi-info-circle"></i> <span class="detail-label">Status:</span>&nbsp; {{ ucfirst($internship->status) }}</div>
-    <div class="detail-row"><i class="bi bi-building"></i> <span class="detail-label">Company:</span>&nbsp; {{ $internship->company_name }}</div>
-    <div class="detail-row"><i class="bi bi-person-badge"></i> <span class="detail-label">Industry Supervisor:</span>&nbsp; {{ $internship->industrySupervisor->user->name ?? '-' }}</div>
-    <div class="detail-row"><i class="bi bi-person-badge-fill"></i> <span class="detail-label">University Supervisor:</span>&nbsp; {{ $internship->universitySupervisor->user->name ?? '-' }}</div>
-    <div class="detail-row"><i class="bi bi-calendar-event"></i> <span class="detail-label">Start Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->start_date)->format('d M Y') }}</div>
-    <div class="detail-row"><i class="bi bi-calendar-check"></i> <span class="detail-label">End Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->end_date)->format('d M Y') }}</div>
-    <div class="detail-row"><i class="bi bi-list-task"></i> <span class="detail-label">Total Tasks:</span>&nbsp; {{ $internship->tasks->count() }}</div>
-    <div class="detail-row"><i class="bi bi-journal-text"></i> <span class="detail-label">Total Daily Reports:</span>&nbsp; {{ $internship->dailyReports->count() }}</div>
-    <div class="detail-row">
-    <i class="bi bi-file-earmark-pdf"></i>
-    <span class="detail-label">Offer Letter:</span>&nbsp;
-    @if($internship->offer_letter)
-        <a href="{{ asset('storage/' . $internship->offer_letter) }}" target="_blank" class="btn btn-indigo btn-sm">
-            <i class="bi bi-eye"></i> View PDF
-        </a>
+    @if(!$internship)
+        <div class="alert alert-info">No internship assigned yet.</div>
     @else
-        <span class="text-muted">Not uploaded</span>
+        <div class="detail-row"><i class="bi bi-info-circle"></i> <span class="detail-label">Status:</span>&nbsp; {{ ucfirst($internship->status) }}</div>
+        <div class="detail-row"><i class="bi bi-building"></i> <span class="detail-label">Company:</span>&nbsp; {{ $internship->company_name }}</div>
+        <div class="detail-row"><i class="bi bi-person-badge"></i> <span class="detail-label">Industry Supervisor:</span>&nbsp; {{ $internship->industrySupervisor->user->name ?? '-' }}</div>
+        <div class="detail-row"><i class="bi bi-person-badge-fill"></i> <span class="detail-label">University Supervisor:</span>&nbsp; {{ $internship->universitySupervisor->user->name ?? '-' }}</div>
+        <div class="detail-row"><i class="bi bi-calendar-event"></i> <span class="detail-label">Start Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->start_date)->format('d M Y') }}</div>
+        <div class="detail-row"><i class="bi bi-calendar-check"></i> <span class="detail-label">End Date:</span>&nbsp; {{ \Carbon\Carbon::parse($internship->end_date)->format('d M Y') }}</div>
+        <div class="detail-row"><i class="bi bi-list-task"></i> <span class="detail-label">Total Tasks:</span>&nbsp; {{ $internship->tasks->count() }}</div>
+        <div class="detail-row"><i class="bi bi-journal-text"></i> <span class="detail-label">Total Daily Reports:</span>&nbsp; {{ $internship->dailyReports->count() }}</div>
+        <div class="detail-row">
+            <i class="bi bi-file-earmark-pdf"></i>
+            <span class="detail-label">Offer Letter:</span>&nbsp;
+            @if($internship->offer_letter)
+                <a href="{{ asset('storage/' . $internship->offer_letter) }}" target="_blank" class="btn btn-indigo btn-sm">
+                    <i class="bi bi-eye"></i> View PDF
+                </a>
+            @else
+                <span class="text-muted">Not uploaded</span>
+            @endif
+        </div>
+        <div class="text-end mt-4">
+            @if($internship)
+                <a href="{{ route('internship.edit') }}" class="btn btn-indigo">
+                    <i class="bi bi-pencil"></i> Edit Internship Details
+                </a>
+            @endif
+        </div>
     @endif
-    </div>  
-    <div class="text-end mt-4">
-        <a href="{{ route('internship.edit', $internship->id) }}" class="btn btn-indigo">
-            <i class="bi bi-pencil"></i> Edit Internship Details
-        </a>
-    </div>
 </div>
 @endsection

@@ -64,9 +64,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
-    Route::get('/internship/{id}', [InternshipController::class, 'show'])->name('internship.show');
-    Route::get('/internship/{id}/edit', [InternshipController::class, 'edit'])->name('internship.edit');
-    Route::post('/internship/{id}', [InternshipController::class, 'update'])->name('internship.update');
+    Route::get('/internship', [InternshipController::class, 'show'])->name('internship.show');
+    Route::get('/internship/edit', [InternshipController::class, 'edit'])->name('internship.edit');
+    Route::post('/internship/update', [InternshipController::class, 'update'])->name('internship.update');
 });
 
 //Route for ASV dashboard
@@ -107,7 +107,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/industry/profile/password', [App\Http\Controllers\IndustryProfileController::class, 'updatePassword'])->name('industry.profile.password');
 });
 
-    Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])->middleware('auth');
 //Route for admin manage accounts
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('users', [AdminUserController::class, 'index'])->name('admin.users.index');

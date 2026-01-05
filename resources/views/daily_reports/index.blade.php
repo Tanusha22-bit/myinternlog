@@ -4,9 +4,9 @@
 <style>
 .filter-card {
     background: #fff;
-    border-radius: 18px;
+    border-radius: 28px; /* more rounded like your sample */
     box-shadow: 0 2px 16px rgba(99,102,241,0.08);
-    padding: 1rem 2rem;
+    padding: 2.2rem 0.5rem 1.2rem 0.5rem; /* more vertical space */
     font-weight: 600;
     font-size: 1.1rem;
     color: #222;
@@ -15,10 +15,25 @@
     border: 2px solid transparent;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center icon and text horizontally */
-    gap: 0.5rem;
-    text-decoration: none !important; /* Remove underline */
-    text-align: center; /* Center text inside */
+    justify-content: center;
+    text-decoration: none !important;
+    text-align: center;
+    width: 200px;
+    height: 140px;
+    min-width: 180px;
+    min-height: 120px;
+    margin: 0 12px;
+}
+.filter-card .filter-count {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #222; /* same as text by default */
+    background: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 0.8rem;
+    line-height: 1;
+    transition: color 0.2s;
 }
 .filter-card.all:hover,
 .filter-card.all.active {
@@ -26,17 +41,29 @@
     color: #fff;
     border-color: #6366F1;
 }
+.filter-card.all:hover .filter-count,
+.filter-card.all.active .filter-count {
+    color: #fff;
+}
 .filter-card.submitted:hover,
 .filter-card.submitted.active {
     background: #FBBF24;
-    color: #222;
+    color: #fff;
     border-color: #FBBF24;
+}
+.filter-card.submitted:hover .filter-count,
+.filter-card.submitted.active .filter-count {
+    color: #fff;
 }
 .filter-card.reviewed:hover,
 .filter-card.reviewed.active {
     background: #22C55E;
     color: #fff;
     border-color: #22C55E;
+}
+.filter-card.reviewed:hover .filter-count,
+.filter-card.reviewed.active .filter-count {
+    color: #fff;
 }
 .table-modern th {
     background: #0F172A;
@@ -81,23 +108,36 @@
 @endsection
 
 @section('content')
+
 <div class="row g-3 mb-4 justify-content-center">
     <div class="col-md-3">
         <a href="{{ route('daily-report.list') }}"
             class="filter-card all{{ empty($activeStatus) ? ' active' : '' }}">
-            <i class="bi bi-collection"></i> All
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-collection mb-1"></i>
+                <span>All</span>
+                <span class="filter-count">{{ $allCount }}</span>
+            </div>
         </a>
     </div>
     <div class="col-md-3">
         <a href="{{ route('daily-report.list', ['status' => 'submitted']) }}"
            class="filter-card submitted{{ $activeStatus === 'submitted' ? ' active' : '' }}">
-            <i class="bi bi-send-check"></i> Submitted
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-send-check mb-1"></i>
+                <span>Submitted</span>
+                <span class="filter-count">{{ $submittedCount }}</span>
+            </div>
         </a>
     </div>
     <div class="col-md-3">
         <a href="{{ route('daily-report.list', ['status' => 'reviewed']) }}"
            class="filter-card reviewed{{ $activeStatus === 'reviewed' ? ' active' : '' }}">
-            <i class="bi bi-check-circle"></i> Reviewed
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-check-circle mb-1"></i>
+                <span>Reviewed</span>
+                <span class="filter-count">{{ $reviewedCount }}</span>
+            </div>
         </a>
     </div>
 </div>

@@ -9,29 +9,42 @@ use Illuminate\Support\Facades\Auth;
 class TaskController extends Controller
 {
     // List all tasks for the student's internship
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        $student = $user->student;
-        $internship = $student->internship; // adjust if needed
+public function index(Request $request)
+{
+    $user = Auth::user();
+    $student = $user->student;
+    $internship = $student->internship; // adjust if needed
 
-        $status = $request->get('status'); // 'pending', 'in_progress', 'completed'
+    $status = $request->get('status'); // 'pending', 'in_progress', 'completed'
 
-        $tasksQuery = $internship
-            ? $internship->tasks()->orderBy('due_date')
-            : \App\Models\Task::query()->whereRaw('0=1');
+    $tasksQuery = $internship
+        ? $internship->tasks()->orderBy('due_date')
+        : \App\Models\Task::query()->whereRaw('0=1');
 
-        if ($status && $status !== 'all') {
+    // Build base query for counts
+    $baseQuery = $internship
+        ? \App\Models\Task::where('internship_id', $internship->id)
+        : \App\Models\Task::query()->whereRaw('0=1');
+
+    $counts = [
+        'all' => (clone $baseQuery)->count(),
+        'completed' => (clone $baseQuery)->where('status', 'completed')->count(),
+        'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
+        'pending' => (clone $baseQuery)->where('status', 'pending')->count(),
+    ];
+
+    if ($status && $status !== 'all') {
         $tasksQuery->where('status', $status);
-        }
-
-        $tasks = $tasksQuery->get();
-
-        return view('tasks.index', [
-            'tasks' => $tasks,
-            'activeStatus' => $status,
-        ]);
     }
+
+    $tasks = $tasksQuery->get();
+
+    return view('tasks.index', [
+        'tasks' => $tasks,
+        'activeStatus' => $status,
+        'counts' => $counts,
+    ]);
+}
 
     // Show a single task
     public function show($id)

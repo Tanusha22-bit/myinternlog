@@ -18,6 +18,18 @@ class DailyReportController extends Controller
     $internship = Internship::where('student_id', $student->id)
         ->where('status', 'active')
         ->first();
+    
+    if (!$internship) {
+        // Just pass nulls and let the view handle the message
+        return view('daily_reports.create', [
+            'internship' => null,
+            'todaysLog' => null,
+            'lastSubmission' => null,
+            'totalWorkingDays' => 0,
+            'submittedDays' => 0,
+            'today' => now(),
+        ]);
+    }
 
     // Dates
     $today = Carbon::today();
@@ -60,51 +72,64 @@ class DailyReportController extends Controller
     ]);
     }
 
-    public function store(Request $request)
-    {
-        $user = Auth::user();
-        $student = $user->student;
-        $internship = Internship::where('student_id', $student->id)
-            ->where('status', 'active')
-            ->first();
+public function store(Request $request)
+{
+    $user = Auth::user();
+    $student = $user->student;
+    $internship = Internship::where('student_id', $student->id)
+        ->where('status', 'active')
+        ->first();
 
-        $request->validate([
-            'report_date' => 'required|date',
-            'task' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf,png,jpeg,jpg,doc,docx|max:10240',
-        ]);
+    $request->validate([
+        'report_date' => 'required|date',
+        'task' => 'required|string',
+        'file' => 'nullable|file|mimes:pdf,png,jpeg,jpg,doc,docx|max:10240',
+    ]);
 
-        $reportDate = Carbon::parse($request->report_date);
+    $reportDate = Carbon::parse($request->report_date)->startOfDay();
+    $today = Carbon::today();
 
-        // Prevent weekends
-        if ($reportDate->isWeekend()) {
-            return back()->withErrors(['report_date' => 'You can only submit reports on weekdays (Monday to Friday).'])->withInput();
-        }
-
-        // Prevent more than 1 report per day
-        $existing = DailyReport::where('internship_id', $internship->id)
-            ->whereDate('report_date', $reportDate)
-            ->first();
-
-        if ($existing) {
-            return back()->withErrors(['report_date' => 'You have already submitted a report for this date.'])->withInput();
-        }
-
-        $filePath = null;
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('daily_reports', 'public');
-        }
-
-        DailyReport::create([
-            'internship_id' => $internship->id,
-            'report_date' => $reportDate,
-            'task' => $request->task,
-            'file' => $filePath,
-            'status' => 'submitted',
-        ]);
-
-        return redirect()->route('daily-report.create')->with('success', 'Daily report submitted!');
+    // 1. Only allow report for today
+    if (!$reportDate->equalTo($today)) {
+        return back()->withErrors(['report_date' => 'You can only submit a report for today ('. $today->format('d M Y') .').'])->withInput();
     }
+
+    // 2. Only allow if today is within internship period
+    $start = Carbon::parse($internship->start_date)->startOfDay();
+    $end = Carbon::parse($internship->end_date)->endOfDay();
+    if ($today->lt($start) || $today->gt($end)) {
+        return back()->withErrors(['report_date' => 'You can only submit reports during your internship period ('. $start->format('d M Y') .' - '. $end->format('d M Y') .').'])->withInput();
+    }
+
+    // 3. Only allow on weekdays
+    if ($today->isWeekend()) {
+        return back()->withErrors(['report_date' => 'You cannot submit reports on weekends (Saturday or Sunday).'])->withInput();
+    }
+
+    // 4. Only one report per day
+    $existing = DailyReport::where('internship_id', $internship->id)
+        ->whereDate('report_date', $today)
+        ->first();
+
+    if ($existing) {
+        return back()->withErrors(['report_date' => 'You have already submitted a report for today.'])->withInput();
+    }
+
+    $filePath = null;
+    if ($request->hasFile('file')) {
+        $filePath = $request->file('file')->store('daily_reports', 'public');
+    }
+
+    DailyReport::create([
+        'internship_id' => $internship->id,
+        'report_date' => $today,
+        'task' => $request->task,
+        'file' => $filePath,
+        'status' => 'submitted',
+    ]);
+
+    return redirect()->route('daily-report.create')->with('success', 'Daily report submitted!');
+}
 
     public function generatePdf()
     {
@@ -149,19 +174,19 @@ class DailyReportController extends Controller
     ]);
     }
 
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        $student = $user->student;
-        $internship = \App\Models\Internship::where('student_id', $student->id)
-            ->where('status', 'active')
-            ->first();
+public function index(Request $request)
+{
+    $user = Auth::user();
+    $student = $user->student;
+    $internship = \App\Models\Internship::where('student_id', $student->id)
+        ->where('status', 'active')
+        ->first();
 
-        $status = $request->get('status'); // 'submitted' or 'reviewed'
+    $status = $request->get('status'); // 'submitted' or 'reviewed'
 
-        $reportsQuery = $internship
-            ? $internship->dailyReports()->orderByDesc('report_date')
-            : DailyReport::query()->whereRaw('0=1');
+    $reportsQuery = $internship
+        ? $internship->dailyReports()->orderByDesc('report_date')
+        : DailyReport::query()->whereRaw('0=1');
 
     if ($status) {
         $reportsQuery->where('status', $status);
@@ -169,9 +194,17 @@ class DailyReportController extends Controller
 
     $reports = $reportsQuery->get();
 
+    // Add counts for all, submitted, reviewed
+    $allCount = $internship ? $internship->dailyReports()->count() : 0;
+    $submittedCount = $internship ? $internship->dailyReports()->where('status', 'submitted')->count() : 0;
+    $reviewedCount = $internship ? $internship->dailyReports()->where('status', 'reviewed')->count() : 0;
+
     return view('daily_reports.index', [
         'reports' => $reports,
         'activeStatus' => $status,
+        'allCount' => $allCount,
+        'submittedCount' => $submittedCount,
+        'reviewedCount' => $reviewedCount,
     ]);
 }
 
