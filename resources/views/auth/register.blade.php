@@ -138,19 +138,81 @@
                     <div class="mb-3">
                         <input type="email" name="email" class="form-control" placeholder="Email" required>
                     </div>
-                    <div class="mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
-                    </div>
-                    <div class="mb-3">
-                        <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password" required>
-                    </div>
+                        @php
+                        $questions = [
+                            "What is your mother's maiden name?",
+                            "What was your first pet's name?",
+                            "What is your favorite food?",
+                            "What city were you born in?",
+                            "What is the name of your first school?"
+                        ];
+                        @endphp
+
+<div class="mb-3">
+    <label>Security Question 1</label>
+    <select name="security_question_1" class="form-select security-question" id="security_question_1" required>
+        <option value="">Select a question</option>
+        @foreach($questions as $q)
+            <option value="{{ $q }}">{{ $q }}</option>
+        @endforeach
+    </select>
+    <input type="text" name="security_answer_1" class="form-control mt-2" placeholder="Answer" required>
+</div>
+<div class="mb-3">
+    <label>Security Question 2</label>
+    <select name="security_question_2" class="form-select security-question" id="security_question_2" required>
+        <option value="">Select a question</option>
+        @foreach($questions as $q)
+            <option value="{{ $q }}">{{ $q }}</option>
+        @endforeach
+    </select>
+    <input type="text" name="security_answer_2" class="form-control mt-2" placeholder="Answer" required>
+</div>
+<div class="mb-3">
+    <label>Security Question 3</label>
+    <select name="security_question_3" class="form-select security-question" id="security_question_3" required>
+        <option value="">Select a question</option>
+        @foreach($questions as $q)
+            <option value="{{ $q }}">{{ $q }}</option>
+        @endforeach
+    </select>
+    <input type="text" name="security_answer_3" class="form-control mt-2" placeholder="Answer" required>
+</div>
+                    <div class="mb-3 position-relative">
+    <input type="password" name="password" id="password" class="form-control" placeholder="Password" required autocomplete="new-password">
+    <div id="password-modal" style="
+        display:none;
+        position:absolute;
+        left:105%;
+        top:0;
+        width:270px;
+        background:#fff;
+        border:1.5px solid #6366F1;
+        border-radius:1rem;
+        box-shadow:0 2px 16px rgba(99,102,241,0.12);
+        padding:16px 18px;
+        z-index:10;
+        font-size:1rem;
+    ">
+        <div id="pw-length" style="color:#dc3545;"><i class="bi bi-x-circle"></i> At least 8 characters</div>
+        <div id="pw-upper" style="color:#dc3545;"><i class="bi bi-x-circle"></i> At least one uppercase letter</div>
+        <div id="pw-lower" style="color:#dc3545;"><i class="bi bi-x-circle"></i> At least one lowercase letter</div>
+        <div id="pw-number" style="color:#dc3545;"><i class="bi bi-x-circle"></i> At least one number</div>
+        <div id="pw-special" style="color:#dc3545;"><i class="bi bi-x-circle"></i> At least one special character (@$!%*#?&)</div>
+    </div>
+</div>
+<div class="mb-3 position-relative">
+    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm Password" required autocomplete="new-password">
+    <div id="pw-match" style="display:none; position:absolute; left:105%; top:0; background:#fff; border:1.5px solid #6366F1; border-radius:1rem; box-shadow:0 2px 16px rgba(99,102,241,0.12); padding:12px 18px; z-index:10; font-size:1rem;">
+        <span id="pw-match-text" style="color:#dc3545;"><i class="bi bi-x-circle"></i> Passwords do not match</span>
+    </div>
+</div>
                     <div class="mb-3">
                         <select name="role" class="form-select" required>
                             <option value="">Select Role</option>
                             <option value="student">Student</option>
                             <option value="industry_sv">Industry Supervisor</option>
                             <option value="university_sv">University Supervisor</option>
-                            <option value="admin">Admin</option>
                         </select>
                     </div>
                     <button class="btn btn-indigo w-100">Register</button>
@@ -170,5 +232,105 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selects = document.querySelectorAll('.security-question');
+
+    function updateOptions() {
+        let selected = Array.from(selects).map(s => s.value).filter(v => v !== "");
+        selects.forEach(select => {
+            Array.from(select.options).forEach(option => {
+                if (option.value === "") return; // Skip placeholder
+                option.disabled = selected.includes(option.value) && select.value !== option.value;
+            });
+        });
+    }
+
+    selects.forEach(select => {
+        select.addEventListener('change', updateOptions);
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Password modal logic
+    const pw = document.getElementById('password');
+    const modal = document.getElementById('password-modal');
+    const pwLength = document.getElementById('pw-length');
+    const pwUpper = document.getElementById('pw-upper');
+    const pwLower = document.getElementById('pw-lower');
+    const pwNumber = document.getElementById('pw-number');
+    const pwSpecial = document.getElementById('pw-special');
+
+    if (pw) {
+        pw.addEventListener('focus', function() {
+            modal.style.display = 'block';
+        });
+        pw.addEventListener('blur', function() {
+            setTimeout(() => { modal.style.display = 'none'; }, 200); // allow click on modal
+        });
+        pw.addEventListener('input', function() {
+            const val = pw.value;
+            // Length
+            if (val.length >= 8) {
+                pwLength.style.color = '#198754'; pwLength.innerHTML = '<i class="bi bi-check-circle"></i> At least 8 characters';
+            } else {
+                pwLength.style.color = '#dc3545'; pwLength.innerHTML = '<i class="bi bi-x-circle"></i> At least 8 characters';
+            }
+            // Uppercase
+            if (/[A-Z]/.test(val)) {
+                pwUpper.style.color = '#198754'; pwUpper.innerHTML = '<i class="bi bi-check-circle"></i> At least one uppercase letter';
+            } else {
+                pwUpper.style.color = '#dc3545'; pwUpper.innerHTML = '<i class="bi bi-x-circle"></i> At least one uppercase letter';
+            }
+            // Lowercase
+            if (/[a-z]/.test(val)) {
+                pwLower.style.color = '#198754'; pwLower.innerHTML = '<i class="bi bi-check-circle"></i> At least one lowercase letter';
+            } else {
+                pwLower.style.color = '#dc3545'; pwLower.innerHTML = '<i class="bi bi-x-circle"></i> At least one lowercase letter';
+            }
+            // Number
+            if (/[0-9]/.test(val)) {
+                pwNumber.style.color = '#198754'; pwNumber.innerHTML = '<i class="bi bi-check-circle"></i> At least one number';
+            } else {
+                pwNumber.style.color = '#dc3545'; pwNumber.innerHTML = '<i class="bi bi-x-circle"></i> At least one number';
+            }
+            // Special
+            if (/[@$!%*#?&]/.test(val)) {
+                pwSpecial.style.color = '#198754'; pwSpecial.innerHTML = '<i class="bi bi-check-circle"></i> At least one special character (@$!%*#?&)';
+            } else {
+                pwSpecial.style.color = '#dc3545'; pwSpecial.innerHTML = '<i class="bi bi-x-circle"></i> At least one special character (@$!%*#?&)';
+            }
+        });
+    }
+
+    // Password match logic
+    const pwc = document.getElementById('password_confirmation');
+    const matchModal = document.getElementById('pw-match');
+    const matchText = document.getElementById('pw-match-text');
+    function checkMatch() {
+        if (pwc && pw && pwc.value.length > 0) {
+            matchModal.style.display = 'block';
+            if (pw.value === pwc.value) {
+                matchText.style.color = '#198754';
+                matchText.innerHTML = '<i class="bi bi-check-circle"></i> Passwords match';
+            } else {
+                matchText.style.color = '#dc3545';
+                matchText.innerHTML = '<i class="bi bi-x-circle"></i> Passwords do not match';
+            }
+        } else if (matchModal) {
+            matchModal.style.display = 'none';
+        }
+    }
+    if (pwc) {
+        pwc.addEventListener('focus', checkMatch);
+        pwc.addEventListener('input', checkMatch);
+        if (pw) pw.addEventListener('input', checkMatch);
+        pwc.addEventListener('blur', function() {
+            setTimeout(() => { matchModal.style.display = 'none'; }, 200);
+        });
+    }
+});
+</script>
 </body>
 </html>

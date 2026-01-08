@@ -27,6 +27,12 @@ public function update(Request $request)
         'phone' => 'nullable|string|max:20',
         'company' => 'nullable|string|max:255',
         'profile_pic' => 'nullable|image|max:2048',
+        'security_question_1' => 'nullable|string|max:255',
+        'security_answer_1' => 'nullable|string|max:255',
+        'security_question_2' => 'nullable|string|max:255',
+        'security_answer_2' => 'nullable|string|max:255',
+        'security_question_3' => 'nullable|string|max:255',
+        'security_answer_3' => 'nullable|string|max:255',
     ]);
 
     $user->name = $request->name;
@@ -34,6 +40,19 @@ public function update(Request $request)
     if ($request->hasFile('profile_pic')) {
         $path = $request->file('profile_pic')->store('profile_pics', 'public');
         $user->profile_pic = $path;
+    }
+
+    if ($request->filled('security_question_1') && $request->filled('security_answer_1')) {
+            $user->security_question_1 = $request->security_question_1;
+            $user->security_answer_1 = \Hash::make($request->security_answer_1);
+    }
+    if ($request->filled('security_question_2') && $request->filled('security_answer_2')) {
+            $user->security_question_2 = $request->security_question_2;
+            $user->security_answer_2 = \Hash::make($request->security_answer_2);
+    }
+    if ($request->filled('security_question_3') && $request->filled('security_answer_3')) {
+            $user->security_question_3 = $request->security_question_3;
+            $user->security_answer_3 = \Hash::make($request->security_answer_3);
     }
     $user->save();
 
@@ -48,7 +67,15 @@ public function update(Request $request)
     {
         $request->validate([
             'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed',
+            'new_password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
         ]);
 
         $user = Auth::user();

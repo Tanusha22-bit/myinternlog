@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - MyInternLog</title>
+    <title>Forgot Password - MyInternLog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
@@ -21,37 +20,10 @@
         body {
             background: var(--bg-main);
         }
-        .navbar-custom {
-            background: var(--bg-main);
-            border-bottom: 1px solid #e5e7eb;
-            padding-top: 0.3rem !important;
-            padding-bottom: 0.3rem !important;
-        }
-        .login-logo {
-            height: 38px;
-            margin-bottom: 0;
-        }
-        .icon-home-btn {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            transition: background 0.2s;
-        }
-        .icon-home-btn:hover {
-            background: var(--primary-hover);
-            color: #fff;
-        }
-        .login-row {
+        .forgot-row {
             min-height: 100vh;
         }
-        .login-left {
+        .forgot-left {
             background: #fff;
             display: flex;
             flex-direction: column;
@@ -59,7 +31,7 @@
             align-items: center;
             padding: 0 2rem;
         }
-        .login-form-box {
+        .forgot-form-box {
             width: 100%;
             max-width: 400px;
             padding: 32px 24px;
@@ -91,7 +63,7 @@
             background: var(--primary-hover);
             color: #fff;
         }
-        .login-right {
+        .forgot-right {
             position: relative;
             background: url('{{ asset('images/login-bg.png') }}') center/cover no-repeat;
             min-height: 100vh;
@@ -99,14 +71,14 @@
             align-items: center;
             justify-content: center;
         }
-        .login-right-overlay {
+        .forgot-right-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(49, 56, 90, 0.80); /* darker and more opaque */
+            background: rgba(49, 56, 90, 0.80);
             backdrop-filter: blur(2px);
             z-index: 1;
         }
-        .login-right-content {
+        .forgot-right-content {
             position: relative;
             z-index: 2;
             color: #fff;
@@ -115,22 +87,14 @@
             margin: auto;
             text-shadow: 0 2px 8px rgba(0,0,0,0.25);
         }
-        .login-right-content h2 {
+        .forgot-right-content h2 {
             font-size: 2rem;
             font-weight: bold;
             margin-bottom: 1rem;
         }
-        .login-right-content p {
+        .forgot-right-content p {
             font-size: 1.15rem;
             color: #e0e7ef;
-        }
-        .forgot-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.98rem;
-        }
-        .forgot-link:hover {
-            text-decoration: underline;
         }
         .register-link {
             color: var(--primary);
@@ -141,8 +105,8 @@
             text-decoration: underline;
         }
         @media (max-width: 991.98px) {
-            .login-right { display: none; }
-            .login-left { flex: 1 0 100%; }
+            .forgot-right { display: none; }
+            .forgot-left { flex: 1 0 100%; }
         }
     </style>
 </head>
@@ -153,51 +117,32 @@
     <i class="bi bi-house-door-fill"></i>
 </a>
 <div class="container-fluid px-0">
-    <div class="row login-row g-0">
+    <div class="row forgot-row g-0">
         <!-- Left: Form (70%) -->
-        <div class="col-lg-7 login-left">
-            <div class="login-form-box mx-auto">
-                <h4 class="mb-4 text-center" style="color:var(--primary);">Login</h4>
-                @if ($errors->any())
-                    <div class="alert alert-danger py-2">
-                        @foreach ($errors->all() as $error)
-                            <div>{{ $error }}</div>
-                        @endforeach
-                    </div>
+        <div class="col-lg-7 forgot-left">
+            <div class="forgot-form-box mx-auto">
+                <h4 class="mb-4 text-center" style="color:var(--primary);">Forgot Password</h4>
+                @if(session('error'))
+                    <div class="alert alert-danger py-2">{{ session('error') }}</div>
                 @endif
-                @if (session('status'))
-                    <div class="alert alert-success text-center">
-                    {{ session('status') }}
-                </div>
-                @endif
-                <form method="POST" action="{{ url('/login') }}">
+                <form method="POST" action="{{ url('/forgot-password') }}">
                     @csrf
                     <div class="mb-3">
-                        <input type="email" name="email" class="form-control" placeholder="Email" required autofocus>
+                        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
                     </div>
-                    <div class="mb-3">
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <input type="checkbox" name="remember" id="remember">
-                            <label for="remember" class="ms-1" style="font-size:0.98rem;color:var(--text-secondary);">Remember me</label>
-                        </div>
-                        <a href="{{ route('forgot.password') }}" class="forgot-link">Forgot password</a>
-                    </div>
-                    <button class="btn btn-indigo w-100 mb-2">Login</button>
+                    <button class="btn btn-indigo w-100">Next</button>
                 </form>
                 <div class="mt-2 text-center">
-                    Not Registered Yet? <a href="{{ route('register') }}" class="register-link">Create An Account</a>
+                    <a href="{{ route('login') }}" class="register-link">Back to Login</a>
                 </div>
             </div>
         </div>
         <!-- Right: Image & Overlay (30%) -->
-        <div class="col-lg-5 login-right">
-            <div class="login-right-overlay"></div>
-            <div class="login-right-content">
-                <h2>Welcome Back!</h2>
-                <p>Login to continue to your internship logbook.<br>Manage your daily reports and supervisor feedback easily.</p>
+        <div class="col-lg-5 forgot-right">
+            <div class="forgot-right-overlay"></div>
+            <div class="forgot-right-content">
+                <h2>Forgot Your Password?</h2>
+                <p>Enter your email to answer your security questions and reset your password.</p>
             </div>
         </div>
     </div>

@@ -16,29 +16,41 @@ use App\Http\Controllers\UniversitySupervisorProfileController;
 use App\Http\Controllers\UniversitySupervisorProgressController;
 use App\Http\Controllers\UniversitySupervisorDashboardController;
 
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot.password');
+Route::post('/forgot-password', [AuthController::class, 'handleForgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset.password');
+Route::get('/security-questions', [AuthController::class, 'showSecurityQuestions'])->name('security.questions');
+Route::post('/security-questions', [AuthController::class, 'checkSecurityQuestions'])->name('security.questions.check');
+Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('reset.password.form');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset.password');
 
-Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
-//Route::get('/dashboard/student', fn() => view('dashboards.student'))->middleware('auth')->name('student.dashboard');
-Route::get('/dashboard/industry', fn() => view('dashboards.industry'))->middleware('auth');
-Route::get('/dashboard/university', [UniversitySupervisorDashboardController::class, 'index'])->middleware('auth');
-//Route::get('/dashboard/university', fn() => view('dashboards.university'))->middleware('auth');
-//Route::get('/dashboard/admin', fn() => view('dashboards.admin'))->middleware('auth');
+// --- Add 'force.password.change' to all authenticated routes except force-change-password ---
+
+Route::get('/dashboard', [StudentDashboardController::class, 'index'])
+    ->middleware(['auth', 'force.password.change'])
+    ->name('student.dashboard');
+
+Route::get('/dashboard/industry', fn() => view('dashboards.industry'))
+    ->middleware(['auth', 'force.password.change']);
+
+Route::get('/dashboard/university', [UniversitySupervisorDashboardController::class, 'index'])
+    ->middleware(['auth', 'force.password.change']);
 
 //Routes for Daily Report
-Route::middleware(['auth', 'ensure.student.profile'])->group(function () {
+Route::middleware(['auth', 'force.password.change', 'ensure.student.profile'])->group(function () {
     Route::get('/daily-report/create', [DailyReportController::class, 'create'])->name('daily-report.create');
     Route::post('/daily-report', [DailyReportController::class, 'store'])->name('daily-report.store');
-    // Route to generate PDF of Daily Reports (Logbook)
     Route::get('/daily-report/pdf', [DailyReportController::class, 'generatePdf'])->name('daily-report.pdf');
     Route::get('/daily-report/pdf-preview', [DailyReportController::class, 'previewPdf'])->name('daily-report.pdf_preview');
     Route::get('/daily-report/{id}/edit', [DailyReportController::class, 'edit'])->name('daily-report.edit');
@@ -46,21 +58,18 @@ Route::middleware(['auth', 'ensure.student.profile'])->group(function () {
     Route::delete('/daily-report/{id}', [DailyReportController::class, 'destroy'])->name('daily-report.destroy');
 });
 
-//Route for Report List
-Route::middleware(['auth', 'ensure.student.profile'])->group(function () {
+Route::middleware(['auth', 'force.password.change', 'ensure.student.profile'])->group(function () {
     Route::get('/daily-report/list', [DailyReportController::class, 'index'])->name('daily-report.list');
     Route::get('/daily-report/{id}', [DailyReportController::class, 'show'])->name('daily-report.show');
 });
 
-//Route for  Task
-Route::middleware(['auth', 'ensure.student.profile'])->group(function () {
+Route::middleware(['auth', 'force.password.change', 'ensure.student.profile'])->group(function () {
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/{id}', [TaskController::class, 'show'])->name('tasks.show');
     Route::put('/tasks/{id}/update', [TaskController::class, 'update'])->name('tasks.update');
 });
 
-//Route for Student_profile
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
@@ -69,13 +78,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/internship/update', [InternshipController::class, 'update'])->name('internship.update');
 });
 
-//Route for ASV dashboard
-Route::middleware(['auth'])
+Route::middleware(['auth', 'force.password.change'])
     ->get('/supervisor/university/dashboard', [UniversitySupervisorDashboardController::class, 'index'])
     ->name('supervisor.university.dashboard');
 
-//Route for ASV Student List view
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/supervisor/university/students', [UniversitySupervisorStudentController::class, 'index'])->name('supervisor.university.students');
     Route::get('/supervisor/university/student/{id}', [UniversitySupervisorStudentController::class, 'show'])->name('supervisor.university.student.show');
     Route::get('/supervisor/profile', [UniversitySupervisorProfileController::class, 'show'])->name('supervisor.university.profile');
@@ -84,15 +91,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/supervisor/university/student/{id}/reports', [UniversitySupervisorStudentController::class, 'studentReports'])->name('supervisor.university.student.reports');
     Route::get('/supervisor/university/report/{id}', [UniversitySupervisorStudentController::class, 'showReport'])->name('supervisor.university.report.show');
     Route::post('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'submitFeedback'])->name('supervisor.university.report.feedback');
-    Route::get('/supervisor/university/progress', [UniversitySupervisorProgressController::class, 'index'])->name('supervisor.university.progress')->middleware('auth');
-    Route::get('/supervisor/university/progress/download', [UniversitySupervisorProgressController::class, 'downloadCsv'])->name('supervisor.university.progress.download')->middleware('auth');
+    Route::get('/supervisor/university/progress', [UniversitySupervisorProgressController::class, 'index'])->name('supervisor.university.progress')->middleware(['auth', 'force.password.change']);
+    Route::get('/supervisor/university/progress/download', [UniversitySupervisorProgressController::class, 'downloadCsv'])->name('supervisor.university.progress.download')->middleware(['auth', 'force.password.change']);
     Route::delete('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'deleteFeedback']);
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/industry/students', [IndustrySupervisorStudentController::class, 'index'])->name('industry.students');
     Route::get('/dashboard/industry', [App\Http\Controllers\IndustryDashboardController::class, 'index'])
-    ->middleware('auth');
+    ->middleware(['auth', 'force.password.change']);
     Route::get('/industry/student/{id}', [IndustrySupervisorStudentController::class, 'show'])->name('industry.student.show');
     Route::get('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryIndex'])->name('industry.tasks');
     Route::post('/industry/tasks', [App\Http\Controllers\TaskController::class, 'industryStore'])->name('industry.tasks.store');
@@ -107,9 +114,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/industry/profile/password', [App\Http\Controllers\IndustryProfileController::class, 'updatePassword'])->name('industry.profile.password');
 });
 
-Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])->middleware('auth');
+Route::get('/dashboard/admin', [AdminDashboardController::class, 'index'])
+    ->middleware(['auth', 'force.password.change']);
+
 //Route for admin manage accounts
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'force.password.change', 'admin'])->prefix('admin')->group(function () {
     Route::get('users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::post('users', [AdminUserController::class, 'store'])->name('admin.users.store');
     Route::put('users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
@@ -133,5 +142,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/admin/assign-supervisor/{student}/edit', [AdminUserController::class, 'editAssignment'])->name('admin.assign-supervisor.edit');
 });
 
-
-
+// --- Do NOT add force.password.change to these two routes! ---
+Route::get('/force-change-password', [AuthController::class, 'showForceChangePassword'])->name('force.change.password');
+Route::post('/force-change-password', [AuthController::class, 'handleForceChangePassword'])->name('force.change.password.post');

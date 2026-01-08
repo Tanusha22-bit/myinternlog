@@ -70,6 +70,12 @@ class ProfileController extends Controller
                 'name' => 'required|string',
                 'email' => 'required|email',
                 'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'security_question_1' => 'nullable|string|max:255',
+                'security_answer_1' => 'nullable|string|max:255',
+                'security_question_2' => 'nullable|string|max:255',
+                'security_answer_2' => 'nullable|string|max:255',
+                'security_question_3' => 'nullable|string|max:255',
+                'security_answer_3' => 'nullable|string|max:255',
             ]);
 
             // Handle profile picture upload
@@ -79,6 +85,19 @@ class ProfileController extends Controller
                     \Storage::disk('public')->delete($user->profile_pic);
                 }
                 $user->profile_pic = $request->file('profile_pic')->store('profile_pics', 'public');
+            }
+
+            if ($request->filled('security_question_1') && $request->filled('security_answer_1')) {
+                $user->security_question_1 = $request->security_question_1;
+                $user->security_answer_1 = \Hash::make($request->security_answer_1);
+            }
+            if ($request->filled('security_question_2') && $request->filled('security_answer_2')) {
+                $user->security_question_2 = $request->security_question_2;
+                $user->security_answer_2 = \Hash::make($request->security_answer_2);
+            }
+            if ($request->filled('security_question_3') && $request->filled('security_answer_3')) {
+                $user->security_question_3 = $request->security_question_3;
+                $user->security_answer_3 = \Hash::make($request->security_answer_3);
             }
 
             $user->name = $request->name;
@@ -99,6 +118,12 @@ class ProfileController extends Controller
             'semester' => 'required|string',
             'phone' => 'required|string',
             'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'security_question_1' => 'nullable|string|max:255',
+            'security_answer_1' => 'nullable|string|max:255',
+            'security_question_2' => 'nullable|string|max:255',
+            'security_answer_2' => 'nullable|string|max:255',
+            'security_question_3' => 'nullable|string|max:255',
+            'security_answer_3' => 'nullable|string|max:255',
         ]);
 
         // Handle profile picture upload
@@ -109,6 +134,19 @@ class ProfileController extends Controller
             }
             $user->profile_pic = $request->file('profile_pic')->store('profile_pics', 'public');
         }
+
+            if ($request->filled('security_question_1') && $request->filled('security_answer_1')) {
+                $user->security_question_1 = $request->security_question_1;
+                $user->security_answer_1 = \Hash::make($request->security_answer_1);
+            }
+            if ($request->filled('security_question_2') && $request->filled('security_answer_2')) {
+                $user->security_question_2 = $request->security_question_2;
+                $user->security_answer_2 = \Hash::make($request->security_answer_2);
+            }
+            if ($request->filled('security_question_3') && $request->filled('security_answer_3')) {
+                $user->security_question_3 = $request->security_question_3;
+                $user->security_answer_3 = \Hash::make($request->security_answer_3);
+            }
 
         $user->name = $request->name;
         $user->email = $request->email;
@@ -128,7 +166,15 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|confirmed|min:6',
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
         ]);
 
         $user = Auth::user();

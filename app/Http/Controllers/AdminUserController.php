@@ -57,6 +57,7 @@ class AdminUserController extends Controller
             'role' => $validated['role'],
             'email' => $validated['email'],
             'password' => bcrypt($request->password),
+            'must_change_password' => true,
         ]);
 
         if ($user->role === 'student') {
