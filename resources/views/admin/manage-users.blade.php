@@ -89,7 +89,7 @@
         </tbody>
     </table>
     <div class="mt-3">
-        {{ $users->links() }}
+        {{ $users->links('vendor.pagination.bootstrap-4') }}
     </div>
 </div>
 </div>

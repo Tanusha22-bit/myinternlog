@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\NewUserRegistered;
+use Illuminate\Support\Facades\Notification;
 
 class AuthController extends Controller
 {
@@ -63,14 +65,29 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
-        Auth::login($user);
-        switch ($user->role) {
-            case 'student': return redirect('/dashboard');
-            case 'industry_sv': return redirect('/dashboard/industry');
-            case 'university_sv': return redirect('/dashboard/university');
-            case 'admin': return redirect('/dashboard/admin');
-            default: return redirect('/');
-        }
+
+        // Automatically create supervisor records if needed
+    if ($user->role === 'industry_sv') {
+    \App\Models\IndustrySupervisor::create([
+        'user_id' => $user->id,
+        'position' => '',
+        'company' => '',
+        'phone' => '',
+    ]);
+    }
+    if ($user->role === 'university_sv') {
+    \App\Models\UniversitySupervisor::create([
+        'user_id' => $user->id,
+        'department' => '',
+        'staff_id' => '',
+        'phone' => '',
+    ]);
+    }
+
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        Notification::send($admins, new NewUserRegistered($user));
+
+        return redirect('/login')->with('status', 'Registration successful! Please log in.');
     }
 
     public function showForgotPassword()

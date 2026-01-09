@@ -21,8 +21,8 @@ class AdminCommunicationController extends Controller
             $dateQuery->where('role', $role);
         }
 
-        $announcements = $announcementQuery->orderByDesc('created_at')->get();
-        $dates = $dateQuery->orderBy('date')->get();
+        $announcements = $announcementQuery->orderByDesc('created_at')->paginate(10);
+        $dates = $dateQuery->orderBy('date')->paginate(10);
 
         return view('admin.communications', compact('tab', 'role', 'announcements', 'dates'));
     }

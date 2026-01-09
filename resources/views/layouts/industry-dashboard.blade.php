@@ -130,8 +130,34 @@
             .sidebar { border-radius: 0; }
             .dashboard-content { padding: 8px; }
         }
+        /* Notification Sidebar Styles */
+.notification-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Hidden by default */
+    width: 350px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 16px rgba(99,102,241,0.12);
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+    z-index: 1050;
+    transition: right 0.35s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+}
+.notification-sidebar.active {
+    right: 0;
+}
+.sidebar-header {
+    border-bottom: 1px solid #e5e7eb;
+}
+.sidebar-body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
     </style>
-    @yield('styles')
+    @yield('styles')  
 </head>
 <body>
     <!-- Mobile Menu Button -->
@@ -187,6 +213,15 @@
                 @endif
             </h2>
             <div class="d-flex align-items-center" style="gap: 12px;">
+                <!-- Notification Bell -->
+        <button type="button" class="btn position-relative" id="notificationBtn" style="background:transparent;">
+            <i class="bi bi-bell" style="font-size:1.5rem;"></i>
+            @if(auth()->user()->unreadNotifications->count())
+                <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ auth()->user()->unreadNotifications->count() }}
+                </span>
+            @endif
+        </button>
                 <span style="font-weight:600;">
                     {{ Auth::user()->name }}
                 </span>
@@ -195,26 +230,122 @@
                      style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #6366F1;">
             </div>
         </div>
+<!-- Notification Sidebar -->
+<div id="notificationSidebar" class="notification-sidebar">
+    <div class="sidebar-header d-flex justify-content-between align-items-center px-4 py-3">
+        <h5 class="mb-0">Notifications</h5>
+        <button type="button" class="btn-close" aria-label="Close" id="closeSidebarBtn"></button>
+    </div>
+    <div class="sidebar-body px-4 pb-4">
+        <h6 class="px-2 pt-2">Unread</h6>
+        <ul class="list-group list-group-flush mb-3">
+            @forelse(auth()->user()->unreadNotifications as $notification)
+                <li class="list-group-item">
+                    <a href="{{ $notification->data['url'] ?? '#' }}"
+                       class="text-decoration-none"
+                       onclick="markAsRead(event, '{{ $notification->id }}', '{{ $notification->data['url'] ?? '#' }}')">
+                        {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                    </a>
+                    <br>
+                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                </li>
+            @empty
+                <li class="list-group-item text-center text-muted">No unread notifications.</li>
+            @endforelse
+        </ul>
+        <h6 class="px-2 pt-2">Viewed</h6>
+        <ul class="list-group list-group-flush">
+            @forelse(auth()->user()->readNotifications as $notification)
+                <li class="list-group-item">
+                    <a href="{{ $notification->data['url'] ?? '#' }}" class="text-decoration-none text-muted">
+                        {{ $notification->data['message'] ?? 'You have a new notification.' }}
+                    </a>
+                    <br>
+                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                </li>
+            @empty
+                <li class="list-group-item text-center text-muted">No viewed notifications.</li>
+            @endforelse
+        </ul>
+    </div>
+</div>
         @yield('content')
     </div>
     @stack('scripts')
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        const toggleBtn = document.getElementById('sidebarToggle');
-        if(toggleBtn && sidebar && overlay) {
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-            });
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar (main menu) toggle
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    if(toggleBtn && sidebar && overlay) {
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+    }
+
+    // Notification Sidebar toggle
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationSidebar = document.getElementById('notificationSidebar');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    if (notificationBtn && notificationSidebar) {
+        notificationBtn.addEventListener('click', function() {
+            notificationSidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    if (closeSidebarBtn && notificationSidebar) {
+        closeSidebarBtn.addEventListener('click', function() {
+            notificationSidebar.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+});
+
+// Mark notification as read, move to "Viewed", update badge, then redirect
+function markAsRead(event, notificationId, url) {
+    event.preventDefault();
+    fetch('/notifications/read/' + notificationId, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    }).then(response => {
+        if(response.ok) {
+            // Move the notification to the "Viewed" section
+            const notifElem = event.target.closest('li');
+            const viewedList = document.querySelector('.sidebar-body ul.list-group:last-of-type');
+            if (notifElem && viewedList) {
+                const link = notifElem.querySelector('a');
+                if(link) link.classList.add('text-muted');
+                viewedList.appendChild(notifElem);
+            }
+
+            // Update badge count in header
+            let badge = document.getElementById('notificationBadge');
+            if (badge) {
+                let count = parseInt(badge.textContent.trim());
+                if (count > 1) {
+                    badge.textContent = count - 1;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            // Wait 500ms before redirecting so user sees the update
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
         }
     });
-    </script>
+}
+</script>
     <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
     <script src="https://files.bpcontent.cloud/2026/01/04/14/20260104145909-PNU329RH.js" defer>
           window.botpressWebChat.init({

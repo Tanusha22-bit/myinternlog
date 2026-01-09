@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\DailyReport;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\SupervisorFeedbackGiven;
 
 class IndustryReportController extends Controller
 {
@@ -14,6 +16,12 @@ public function index(Request $request)
 {
     $user = Auth::user();
     $industrySupervisor = DB::table('industry_supervisors')->where('user_id', $user->id)->first();
+    $internship = DB::table('internships')->where('industry_sv_id', $industrySupervisor->id)->first();
+
+    if (!$industrySupervisor) {
+        abort(403, 'You are not an industry supervisor.');
+    }
+
     $internship = DB::table('internships')->where('industry_sv_id', $industrySupervisor->id)->first();
 
     $status = $request->get('status', 'all');
@@ -63,13 +71,16 @@ public function feedback(Request $request, $reportId)
     $user = Auth::user();
     $industrySupervisor = DB::table('industry_supervisors')->where('user_id', $user->id)->first();
 
-    $report = DailyReport::findOrFail($reportId);
+    $report = \App\Models\DailyReport::with('internship.student.user')->findOrFail($reportId);
 
     // Always allow updating feedback
     $report->industry_feedback = $request->industry_feedback;
     $report->industry_feedback_by = $industrySupervisor->id;
     $report->industry_feedback_date = now();
     $report->save();
+
+    $studentUser = $report->internship->student->user;
+    $studentUser->notify(new SupervisorFeedbackGiven($request->industry_feedback, $report->id));
 
     return redirect()->route('industry.reports')->with('success', 'Feedback submitted!');
 }

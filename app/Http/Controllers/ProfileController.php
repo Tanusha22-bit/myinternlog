@@ -109,6 +109,10 @@ class ProfileController extends Controller
 
         // For students
         $student = $user->student;
+        if (!$student) {
+            $student = new Student();
+            $student->user_id = $user->id;
+        }
 
         $request->validate([
             'name' => 'required|string',

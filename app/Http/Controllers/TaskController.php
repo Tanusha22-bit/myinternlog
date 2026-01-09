@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\TaskAssigned;
+
 
 class TaskController extends Controller
 {
@@ -69,6 +71,12 @@ public function index(Request $request)
         $task->student_note = $request->student_note;
         $task->save();
 
+        $industrySupervisorUser = $task->internship->industrySupervisor->user ?? null;
+
+        if ($industrySupervisorUser) {
+        $industrySupervisorUser->notify(new \App\Notifications\TaskStatusUpdated($task));
+        }
+
         return redirect()->route('tasks.index')->with('success', 'Task updated!');
     }
 
@@ -131,13 +139,18 @@ public function industryStore(Request $request)
         'due_date' => 'nullable|date',
     ]);
 
-    Task::create([
+    $task = Task::create([
         'internship_id' => $internship->id,
         'title' => $request->title,
         'description' => $request->description,
         'due_date' => $request->due_date,
         'status' => 'pending',
     ]);
+
+    $internshipModel = \App\Models\Internship::find($internship->id);
+    $student = $internshipModel->student;
+    $user = $student->user;
+    $user->notify(new TaskAssigned($task));
 
     return redirect()->route('industry.tasks')->with('success', 'Task assigned!');
 }

@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\SupervisorFeedbackGiven;
 
 class UniversitySupervisorStudentController extends Controller
 {
@@ -108,7 +110,7 @@ public function showReport($id)
             'daily_reports.*',
             'users.name as student_name',
             'students.student_id as matric_id',
-            'students.id as student_id' // <-- add this line
+            'students.id as student_id',
         )
         ->first();
 
@@ -141,6 +143,8 @@ public function submitFeedback(Request $request, $id)
 
     return redirect()->route('supervisor.university.report.show', $id)
     ->with('success', 'Feedback submitted successfully!');
+    $student = $report->internship->student->user;
+    $student->notify(new SupervisorFeedbackGiven($feedback));
 }
 
 public function studentReports(Request $request, $studentId)

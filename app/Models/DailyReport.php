@@ -16,4 +16,9 @@ class DailyReport extends Model
         'student_notes',
         'status',
     ];
+
+    public function internship()
+    {
+        return $this->belongsTo(\App\Models\Internship::class, 'internship_id');
+    }
 }

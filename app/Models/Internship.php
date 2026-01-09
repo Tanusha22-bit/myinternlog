@@ -17,7 +17,7 @@ class Internship extends Model
     {
         return $this->belongsTo(\App\Models\UniversitySupervisor::class, 'university_sv_id');
     }
-    public function student() { return $this->belongsTo(Student::class, 'student_id'); }
+    public function student() { return $this->belongsTo(\App\Models\Student::class, 'student_id'); }
     
     protected $fillable = [
     'student_id',

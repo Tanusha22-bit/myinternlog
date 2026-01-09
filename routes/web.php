@@ -20,7 +20,24 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/post-login-redirect', function () {
+    $user = auth()->user();
+    switch ($user->role) {
+        case 'student': return redirect('/dashboard');
+        case 'industry_sv': return redirect('/dashboard/industry');
+        case 'university_sv': return redirect('/dashboard/university');
+        case 'admin': return redirect('/dashboard/admin');
+        default: return redirect('/');
+    }
+})->middleware(['auth', 'force.password.change'])->name('post.login.redirect');
 
+Route::post('/notifications/read/{id}', function ($id) {
+    $notification = auth()->user()->notifications()->where('id', $id)->first();
+    if ($notification) {
+        $notification->markAsRead();
+    }
+    return response()->json(['success' => true]);
+})->middleware('auth');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

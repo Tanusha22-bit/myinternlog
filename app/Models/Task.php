@@ -18,4 +18,8 @@ class Task extends Model
         'student_note',
     ];
 
+public function internship() {
+    return $this->belongsTo(\App\Models\Internship::class, 'internship_id');
+}
+
 }

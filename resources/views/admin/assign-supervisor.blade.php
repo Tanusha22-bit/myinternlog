@@ -39,7 +39,7 @@
 <div class="card-modern p-4 mb-4">
     <div class="table-responsive">
     <table class="table align-middle mb-0" style="border-radius:18px; overflow:hidden;">
-        <thead style="background:#f3f4f6;">
+        <thead class="custom-thead">
             <tr>
                 <th>Student Name</th>
                 <th>Matric ID</th>
@@ -53,22 +53,22 @@
             @foreach($students as $student)
             <tr>
                 <td>{{ $student->name }}</td>
-                <td>{{ $student->student->student_id ?? '-' }}</td>
-                <td>{{ $student->student->internship->industrySupervisor->user->name ?? '-' }}</td>
-                <td>{{ $student->student->internship->universitySupervisor->user->name ?? '-' }}</td>
+                <td>{{ $student->student?->student_id ?? '-' }}</td>
+                <td>{{ $student->student?->internship?->industrySupervisor?->user?->name ?? '-' }}</td>
+                <td>{{ $student->student?->internship?->universitySupervisor?->user?->name ?? '-' }}</td>
                 <td>
-                    @if(isset($student->student->internship->status))
-                        @if($student->student->internship->status == 'active')
+                    @if(isset($student->student?->internship?->status))
+                        @if($student->student?->internship?->status == 'active')
                             <span class="badge bg-success">Active</span>
-                        @elseif($student->student->internship->status == 'completed')
+                        @elseif($student->student?->internship?->status == 'completed')
                             <span class="badge bg-primary">Completed</span>
-                        @elseif($student->student->internship->status == 'terminated')
+                        @elseif($student->student?->internship?->status == 'terminated')
                             <span class="badge bg-danger">Terminated</span>
                         @else
-                            <span class="badge bg-secondary">{{ ucfirst($student->student->internship->status) }}</span>
+                            <span class="badge bg-secondary">{{ ucfirst($student->student?->internship?->status) }}</span>
                         @endif
                     @else
-                        <span class="badge bg-secondary">-</span>
+                        <span class="badge bg-secondary">Pending</span>
                     @endif
                 </td>
                 <td>
@@ -80,19 +80,22 @@
             @endforeach
         </tbody>
     </table>
-</div>
+    <div class="mt-3">
+        {{ $students->links('vendor.pagination.bootstrap-4') }}
+    </div>
+    </div>
 </div>
 
 <!-- All modals OUTSIDE the table -->
 @foreach($students as $student)
 <div class="modal fade custom-assign-modal" id="viewEditModal{{ $student->id }}" tabindex="-1" aria-labelledby="viewEditModalLabel{{ $student->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content" method="POST" action="{{ $student->student->internship ? route('admin.assign-supervisor.update', $student->student->internship->id) : route('admin.assign-supervisor.store') }}">
+        <form class="modal-content" method="POST" action="{{ $student->student?->internship ? route('admin.assign-supervisor.update', $student->student?->internship?->id) : route('admin.assign-supervisor.store') }}">
             @csrf
-            @if($student->student->internship)
+            @if($student->student?->internship)
                 @method('PUT')
             @else
-                <input type="hidden" name="student_id" value="{{ $student->student->id }}">
+                <input type="hidden" name="student_id" value="{{ $student->student?->id }}">
             @endif
             <div class="modal-header" style="border-bottom:none; background:transparent;">
                 <h4 class="modal-title w-100 text-center" id="viewEditModalLabel{{ $student->id }}" style="font-weight: bold; color:#6366F1;">Assignment Details</h4>
@@ -105,23 +108,23 @@
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Matric ID:</label>
-                    <input type="text" class="form-control" value="{{ $student->student->student_id ?? '-' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $student->student?->student_id ?? '-' }}" readonly>
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Company Name:</label>
-                    <input type="text" name="company_name" class="form-control" value="{{ $student->student->internship->company_name ?? '' }}">
+                    <input type="text" name="company_name" class="form-control" value="{{ $student->student?->internship?->company_name ?? '' }}">
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Company Address:</label>
-                    <input type="text" name="company_address" class="form-control" value="{{ $student->student->internship->company_address ?? '' }}">
+                    <input type="text" name="company_address" class="form-control" value="{{ $student->student?->internship?->company_address ?? '' }}">
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Start Date:</label>
-                    <input type="date" name="start_date" class="form-control" value="{{ $student->student->internship->start_date ?? '' }}">
+                    <input type="date" name="start_date" class="form-control" value="{{ $student->student?->internship?->start_date ?? '' }}">
                 </div>
                 <div class="mb-2">
                     <label class="form-label">End Date:</label>
-                    <input type="date" name="end_date" class="form-control" value="{{ $student->student->internship->end_date ?? '' }}">
+                    <input type="date" name="end_date" class="form-control" value="{{ $student->student?->internship?->end_date ?? '' }}">
                 </div>
                 <div class="mb-2">
                     <label class="form-label">Industry Supervisor:</label>
@@ -129,7 +132,7 @@
                         <option value="">Select</option>
                         @foreach($industrySupervisors as $sv)
                             <option value="{{ $sv->industrySupervisor->id ?? '' }}"
-                                {{ ($student->student->internship->industry_sv_id ?? '') == ($sv->industrySupervisor->id ?? '') ? 'selected' : '' }}>
+                                {{ ($student->student?->internship?->industry_sv_id ?? '') == ($sv->industrySupervisor->id ?? '') ? 'selected' : '' }}>
                                 {{ $sv->name }}
                             </option>
                         @endforeach
@@ -141,7 +144,7 @@
                         <option value="">Select</option>
                         @foreach($universitySupervisors as $sv)
                             <option value="{{ $sv->universitySupervisor->id ?? '' }}"
-                                {{ ($student->student->internship->university_sv_id ?? '') == ($sv->universitySupervisor->id ?? '') ? 'selected' : '' }}>
+                                {{ ($student->student?->internship?->university_sv_id ?? '') == ($sv->universitySupervisor->id ?? '') ? 'selected' : '' }}>
                                 {{ $sv->name }}
                             </option>
                         @endforeach
@@ -150,9 +153,9 @@
                 <div class="mb-2">
                     <label class="form-label">Status:</label>
                     <select name="status" class="form-control">
-                        <option value="active" {{ ($student->student->internship->status ?? '') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="completed" {{ ($student->student->internship->status ?? '') == 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="terminated" {{ ($student->student->internship->status ?? '') == 'terminated' ? 'selected' : '' }}>Terminated</option>
+                        <option value="active" {{ ($student->student?->internship?->status ?? '') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="completed" {{ ($student->student?->internship?->status ?? '') == 'completed' ? 'selected' : '' }}>Completed</option>
+                        <option value="terminated" {{ ($student->student?->internship?->status ?? '') == 'terminated' ? 'selected' : '' }}>Terminated</option>
                     </select>
                 </div>
             </div>
@@ -304,6 +307,14 @@
 .cards-row-scroll::-webkit-scrollbar-thumb {
     background: #ddd;
     border-radius: 4px;
+}
+table thead.custom-thead, 
+table thead.custom-thead tr, 
+table thead.custom-thead th {
+    background: #0F172A !important;
+}
+table thead.custom-thead th {
+    color: #fff !important;
 }
 </style>
 @endsection

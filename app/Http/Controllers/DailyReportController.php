@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\DailyReportSubmitted;
+use Illuminate\Support\Facades\Notification;
 
 class DailyReportController extends Controller
 {
@@ -120,13 +122,17 @@ public function store(Request $request)
         $filePath = $request->file('file')->store('daily_reports', 'public');
     }
 
-    DailyReport::create([
+    $report = DailyReport::create([
         'internship_id' => $internship->id,
         'report_date' => $today,
         'task' => $request->task,
         'file' => $filePath,
         'status' => 'submitted',
     ]);
+
+    $industrySupervisor = $internship->industrySupervisor->user;
+    $universitySupervisor = $internship->universitySupervisor->user;
+    Notification::send([$industrySupervisor, $universitySupervisor], new DailyReportSubmitted($report));
 
     return redirect()->route('daily-report.create')->with('success', 'Daily report submitted!');
 }

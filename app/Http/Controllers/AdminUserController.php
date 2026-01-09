@@ -165,7 +165,7 @@ public function assignSupervisorPage(Request $request)
         });
     }
 
-    $students = $studentsQuery->get();
+    $students = $studentsQuery->paginate(10);
 
     // Counts for cards
     $allCount = User::where('role', 'student')->count();

@@ -220,6 +220,7 @@ table thead.custom-thead th {
                     @endforelse
                 </tbody>
             </table>
+            {{ $announcements->appends(request()->query())->links('vendor.pagination.bootstrap-4') }}
         @else
             <table class="table align-middle mb-0">
                 <thead class="custom-thead">
@@ -255,6 +256,7 @@ table thead.custom-thead th {
                     @endforelse
                 </tbody>
             </table>
+            {{ $dates->appends(request()->query())->links('vendor.pagination.bootstrap-4') }}
         @endif
     </div>
 </div>

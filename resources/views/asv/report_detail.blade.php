@@ -60,9 +60,17 @@
             </span>
         </div>
         <div class="col-md-12 mb-2">
-            <span class="info-label">Task:</span>
+            <span class="info-label">Log:</span>
             <span class="info-value ms-2">{{ $report->task }}</span>
         </div>
+        <div class="col-md-12 mb-2">
+    <span class="info-label">Industry Supervisor Feedback:</span>
+    @if($report->industry_feedback)
+        <span class="info-value ms-2">{{ $report->industry_feedback }}</span>
+    @else
+        <span class="no-file-msg ms-2"><i class="bi bi-x-circle"></i> No feedback given</span>
+    @endif
+</div>
         <div class="col-md-12 mb-2">
             <span class="info-label">Attachment:</span>
             @if($report->file)
