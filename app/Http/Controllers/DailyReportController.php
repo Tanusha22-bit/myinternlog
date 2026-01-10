@@ -198,7 +198,7 @@ public function index(Request $request)
         $reportsQuery->where('status', $status);
     }
 
-    $reports = $reportsQuery->get();
+    $reports = $reportsQuery->paginate(10);
 
     // Add counts for all, submitted, reviewed
     $allCount = $internship ? $internship->dailyReports()->count() : 0;
@@ -265,7 +265,7 @@ public function index(Request $request)
 
     $report->save();
 
-    return redirect()->route('daily-report.show', $report->id)->with('success', 'Report updated!');
+    return redirect()->route('daily-report.list')->with('success', 'Report updated successfully!');
     }
 
     public function destroy($id)

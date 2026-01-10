@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Student;
+use App\Notifications\RemindFillCompany;
 
 class UniversitySupervisorProgressController extends Controller
 {
@@ -26,7 +28,9 @@ public function index(Request $request)
             'users.name as student_name',
             'internships.company_name',
             'internships.status as internship_status',
-            'internships.id as internship_id'
+            'internships.id as internship_id',
+            'internships.start_date as internship_start_date',
+            'internships.end_date as internship_end_date'
         );
 
     if ($status) {
@@ -48,6 +52,19 @@ public function index(Request $request)
     $totalReports = 0;
 
     foreach ($students as $student) {
+        // Calculate expected reports (weekdays only)
+        $totalExpectedReports = 0;
+        if ($student->internship_start_date && $student->internship_end_date) {
+            $start = \Carbon\Carbon::parse($student->internship_start_date);
+            $end = \Carbon\Carbon::parse($student->internship_end_date);
+            $period = new \DatePeriod($start, new \DateInterval('P1D'), $end->copy()->addDay());
+            foreach ($period as $date) {
+                if (!in_array($date->format('N'), [6,7])) { // 6=Saturday, 7=Sunday
+                    $totalExpectedReports++;
+                }
+            }
+        }
+
         $totalReportsCount = \DB::table('daily_reports')
             ->where('internship_id', $student->internship_id)
             ->count();
@@ -62,14 +79,18 @@ public function index(Request $request)
             ->orderByDesc('report_date')
             ->first();
 
-        // Assume progress is % of reports submitted out of 20 (or use your own logic)
-        $progress = $totalReportsCount ? min(100, round(($totalReportsCount / 20) * 100)) : 0;
+        // Progress calculation
+        $progress = ($totalExpectedReports > 0)
+            ? min(100, round(($totalReportsCount / $totalExpectedReports) * 100))
+            : 0;
+
         $progressData[] = [
             'student' => $student,
             'progress' => $progress,
             'last_report' => $lastReport ? $lastReport->report_date : '-',
             'feedback' => $feedbackCount,
             'total_reports' => $totalReportsCount,
+            'expected_reports' => $totalExpectedReports,
         ];
         $totalProgress += $progress;
         $feedbackGiven += $feedbackCount;
@@ -180,5 +201,13 @@ public function downloadCsv(Request $request)
     };
 
     return response()->stream($callback, 200, $headers);
+}
+
+public function remindCompany($studentId)
+{
+    $student = \App\Models\Student::with('user')->findOrFail($studentId);
+    $student->user->notify(new RemindFillCompany());
+
+    return back()->with('success', 'Reminder notification sent to student!');
 }
 }

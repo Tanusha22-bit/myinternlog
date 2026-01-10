@@ -39,6 +39,8 @@ Route::post('/notifications/read/{id}', function ($id) {
     return response()->json(['success' => true]);
 })->middleware('auth');
 
+Route::post('/supervisor/remind-company/{student}', [UniversitySupervisorProgressController::class, 'remindCompany'])->name('supervisor.remind.company')->middleware('auth');
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -157,6 +159,12 @@ Route::middleware(['auth', 'force.password.change', 'admin'])->prefix('admin')->
     Route::get('/download/assignments-csv', [AdminDashboardController::class, 'downloadAssignmentsCsv'])->name('admin.download.assignments.csv');
     Route::get('/download/analytics-csv', [AdminDashboardController::class, 'downloadAnalyticsCsv'])->name('admin.download.analytics.csv');
     Route::get('/admin/assign-supervisor/{student}/edit', [AdminUserController::class, 'editAssignment'])->name('admin.assign-supervisor.edit');
+    Route::get('/admin/history', [AdminUserController::class, 'historyPage'])->name('admin.history');
+    Route::put('students/{user}', [AdminUserController::class, 'update'])->name('admin.students.update');
+    Route::delete('students/{user}', [AdminUserController::class, 'destroy'])->name('admin.students.destroy');
+    Route::post('communications/document', [App\Http\Controllers\AdminCommunicationController::class, 'storeDocument'])->name('admin.communications.document.store');
+    Route::delete('communications/document/{document}', [App\Http\Controllers\AdminCommunicationController::class, 'destroyDocument'])->name('admin.communications.document.destroy');
+    Route::put('communications/document/{document}', [App\Http\Controllers\AdminCommunicationController::class, 'updateDocument'])->name('admin.communications.document.update');
 });
 
 // --- Do NOT add force.password.change to these two routes! ---

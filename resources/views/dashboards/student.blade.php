@@ -117,6 +117,22 @@
         visibility: hidden;
     }
 }
+.btn-indigo {
+    background: #6366F1;
+    color: #fff !important;
+    border-radius: 999px;
+    font-weight: 600;
+    border: none;
+    transition: background 0.2s;
+    padding: 0.5rem 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-indigo:hover, .btn-indigo:focus {
+    background: #4f46e5;
+    color: #fff !important;
+}
 </style>
 @endsection
 
@@ -239,19 +255,19 @@
         <div class="card card-modern p-4 h-100">
             <div class="card-title"><i class="bi bi-download icon"></i> Downloadable Documents</div>
             @if($documents->count())
-            <ul class="list-group">
-                @foreach($documents as $doc)
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-file-earmark-pdf"></i> {{ $doc->title }}</span>
-                    <a href="{{ asset('storage/' . $doc->file_path) }}" class="btn btn-indigo btn-sm" target="_blank">
-                        <i class="bi bi-download"></i> Download
-                    </a>
-                </li>
-                @endforeach
-            </ul>
-            @else
-            <div class="text-muted text-center">No documents available.</div>
-            @endif
+<div class="card-modern p-4 mb-4">
+    <ul class="list-group">
+        @foreach($documents as $doc)
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ $doc->title }}
+            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="btn btn-indigo btn-sm">
+                <i class="bi bi-download"></i>
+            </a>
+        </li>
+        @endforeach
+    </ul>
+</div>
+@endif
         </div>
     </div>
 </div>

@@ -22,7 +22,12 @@ public function index()
     $totalAnnouncements = \App\Models\Announcement::count();
     $totalDates = \App\Models\ImportantDate::count();
     $activeInternships = \App\Models\Internship::where('status', 'active')->count();
-    $pendingAssignments = \App\Models\Internship::whereNull('industry_sv_id')->orWhereNull('university_sv_id')->count();
+    $pendingAssignments = 
+    \App\Models\User::where('role', 'student')->whereDoesntHave('student.internship')->count()
+    +
+    \App\Models\Internship::where(function($q){
+        $q->whereNull('industry_sv_id')->orWhereNull('university_sv_id');
+    })->count();
 
     // Registrations over time (monthly for current year)
     $registrationLabels = [];

@@ -57,6 +57,22 @@
         min-width: 100px;
         margin-bottom: 0;
     }
+    .dashboard-card canvas {
+        width: 100% !important;
+        height: 300px !important;
+    }
+    #statusChart {
+    display: block;
+    margin: 0 auto;
+    width: 300px !important;
+    height: 300px !important;
+    max-width: 100%;
+    max-height: 100%;
+}
+#reportsChart {
+    width: 100% !important;
+    height: 300px !important;
+}
 </style>
 @endsection
 
@@ -66,9 +82,9 @@
 </div>
 
 <!-- Analytics Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="dashboard-card flex-fill text-center">
+<div class="row g-4 mb-4 align-items-stretch">
+    <div class="col-md-4 d-flex">
+        <div class="dashboard-card flex-fill text-center d-flex flex-column h-100">
             <div class="fw-bold mb-1"><i class="bi bi-bar-chart"></i> Average Progress</div>
             <div class="display-6">{{ $avgProgress }}%</div>
             <div class="progress-bar-bg mt-2">
@@ -76,14 +92,14 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="dashboard-card flex-fill text-center">
+    <div class="col-md-4 d-flex">
+        <div class="dashboard-card flex-fill text-center d-flex flex-column h-100">
             <div class="fw-bold mb-1"><i class="bi bi-chat-dots"></i> Feedback Given</div>
             <div class="display-6">{{ $feedbackGiven }}</div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="dashboard-card flex-fill text-center">
+    <div class="col-md-4 d-flex">
+        <div class="dashboard-card flex-fill text-center d-flex flex-column h-100">
             <div class="fw-bold mb-1"><i class="bi bi-people"></i> Total Students</div>
             <div class="display-6">{{ count($students) }}</div>
         </div>
@@ -110,7 +126,6 @@
     </div>
     <div class="col-md-3 text-end">
         <a href="{{ route('supervisor.university.progress.download', request()->all()) }}" class="progress-action-btn bg-green">Download Progress Report</a>
-        <!-- <a href="#" class="progress-action-btn bg-yellow">Send Reminder</a> -->
     </div>
 </form>
 
@@ -123,7 +138,7 @@
                     <th>Name</th>
                     <th>Matric ID</th>
                     <th>Company</th>
-                    <th>Progress</th>
+                    <th class="text-center">Progress</th>
                     <th>Status</th>
                     <th>Last Report</th>
                     <th>Feedback</th>
@@ -135,13 +150,30 @@
                 <tr>
                     <td>{{ $data['student']->student_name }}</td>
                     <td>{{ $data['student']->student_id }}</td>
-                    <td>{{ $data['student']->company_name }}</td>
                     <td>
-                        <div class="progress-bar-bg" style="width:100px;">
-                            <div class="progress-bar-fill" style="width:{{ $data['progress'] }}%;"></div>
-                        </div>
-                        <span class="ms-2">{{ $data['progress'] }}%</span>
-                    </td>
+    @if($data['student']->company_name)
+        {{ $data['student']->company_name }}
+    @else
+        <!-- Remind Button triggers modal -->
+        <button type="button"
+            class="btn btn-sm btn-warning"
+            data-bs-toggle="modal"
+            data-bs-target="#remindModal"
+            data-student-id="{{ $data['student']->id }}"
+            data-student-name="{{ $data['student']->student_name }}">
+            <i class="bi bi-exclamation-circle"></i> Remind to Fill
+        </button>
+    @endif
+</td>
+                   <td>
+    <div class="progress-bar-bg" style="width:120px; display:inline-block; vertical-align:middle;">
+        <div class="progress-bar-fill" style="width: {{ max($data['progress'], 4) }}%;"></div>
+    </div>
+    <span class="ms-2 fw-bold">{{ $data['progress'] }}%</span>
+    <span class="text-muted ms-2" style="font-size:0.95em;">
+        ({{ $data['total_reports'] }}/{{ $data['expected_reports'] }})
+    </span>
+</td>
                     <td>
                         <span class="badge bg-{{ $data['student']->internship_status == 'active' ? 'success' : ($data['student']->internship_status == 'completed' ? 'secondary' : 'warning text-dark') }}">
                             {{ ucfirst($data['student']->internship_status) }}
@@ -164,24 +196,60 @@
         </table>
     </div>
 </div>
-
+<!-- Remind Modal -->
+<div class="modal fade" id="remindModal" tabindex="-1" aria-labelledby="remindModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="remindForm" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-center w-100 text-warning" id="remindModalLabel">Send Reminder</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p>Are you sure you want to send a reminder to <span id="studentName"></span> to fill in their company details?</p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="submit" class="btn btn-warning">Send Reminder</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <!-- Charts -->
 <div class="row g-4">
     <div class="col-md-6">
-        <div class="dashboard-card">
+        <div class="dashboard-card" style="min-height: 400px;">
             <div class="fw-bold mb-2"><i class="bi bi-pie-chart"></i> Students by Status</div>
             <canvas id="statusChart"></canvas>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="dashboard-card">
+        <div class="dashboard-card" style="min-height: 400px;">
             <div class="fw-bold mb-2"><i class="bi bi-graph-up"></i> Reports Submitted Over Time</div>
             <canvas id="reportsChart"></canvas>
         </div>
     </div>
 </div>
-
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var remindModal = document.getElementById('remindModal');
+    remindModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var studentId = button.getAttribute('data-student-id');
+        var studentName = button.getAttribute('data-student-name');
+        var form = document.getElementById('remindForm');
+        var nameSpan = document.getElementById('studentName');
+        form.action = "{{ route('supervisor.remind.company', ':id') }}".replace(':id', studentId);
+        nameSpan.textContent = studentName;
+    });
+});
+</script>
+@endpush
 
 @push('scripts')
 <script>

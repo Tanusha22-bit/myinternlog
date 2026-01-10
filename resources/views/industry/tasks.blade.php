@@ -24,10 +24,13 @@
         transition: background 0.2s;
     }
     .btn-purple:hover { background: #4F46E5; }
+    .modal { z-index: 2000; }
 </style>
 @endsection
-@section('content')
 
+@section('content')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@php use Carbon\Carbon; @endphp
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
@@ -79,7 +82,12 @@
                 <input type="text" name="title" class="form-control" placeholder="Task Title" required>
             </div>
             <div class="mb-3">
-                <input type="date" name="due_date" class="form-control" placeholder="Due Date">
+                @php
+                    $minDueDate = \Carbon\Carbon::parse($startDate)->greaterThan(\Carbon\Carbon::today())
+                    ? $startDate
+                    : \Carbon\Carbon::today()->toDateString();
+                @endphp
+                <input type="date" name="due_date" class="form-control" placeholder="Due Date" min="{{ $minDueDate }}" max="{{ $endDate }}">
             </div>
             <div class="mb-3">
                 <input type="text" name="description" class="form-control" placeholder="Description">
@@ -119,86 +127,128 @@
                     </td>
                     <td>{{ $task->student_note }}</td>
                     <td>
-    @if($task->status !== 'completed')
-    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ $task->id }}">
-        <i class="bi bi-pencil"></i>
-    </button>
-    @else
-    <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-pencil"></i></button>
-    @endif
-    <form action="{{ route('industry.tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
-        @csrf @method('DELETE')
-        <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?')"><i class="bi bi-trash"></i></button>
-    </form>
-    <!-- View Button -->
-    <button class="btn btn-sm  btn-purple" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}">
-        <i class="bi bi-eye"></i>
-    </button>
-</td>
+                        @if($task->status !== 'completed')
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ $task->id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        @else
+                        <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-pencil"></i></button>
+                        @endif
+                        <form action="{{ route('industry.tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
+                            @csrf @method('DELETE')
+                            <button type="button" class="btn btn-sm btn-danger delete-task-btn" data-task-id="{{ $task->id }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        <!-- View Button -->
+                        <button class="btn btn-sm  btn-purple" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
                 </tr>
                 @empty
                 <tr><td colspan="5" class="text-center text-muted">No tasks assigned.</td></tr>
                 @endforelse
             </tbody>
         </table>
+        <div class="mt-3">
+            {{ $tasks->links('vendor.pagination.bootstrap-4') }}
+        </div>
 
         @foreach($tasks as $task)
-         <!-- View Modal !-->
-<div class="modal fade" id="viewTaskModal{{ $task->id }}" tabindex="-1" aria-labelledby="viewTaskModalLabel{{ $task->id }}" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content card-modern">
-      <div class="modal-header">
-        <h5 class="modal-title" id="viewTaskModalLabel{{ $task->id }}"><i class="bi bi-eye"></i> Task Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>Title:</strong> {{ $task->title }}</p>
-        <p><strong>Description:</strong> {{ $task->description }}</p>
-        <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
-        <p><strong>Status:</strong>
-            <span class="badge bg-{{ $task->status == 'completed' ? 'success' : ($task->status == 'in_progress' ? 'primary' : 'warning text-dark') }}">
-                {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-            </span>
-        </p>
-        <p><strong>Student Note:</strong> {{ $task->student_note }}</p>
-      </div>
+        <!-- View Modal -->
+        <div class="modal fade" id="viewTaskModal{{ $task->id }}" tabindex="-1" aria-labelledby="viewTaskModalLabel{{ $task->id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content card-modern">
+              <div class="modal-header">
+                <h5 class="modal-title" id="viewTaskModalLabel{{ $task->id }}"><i class="bi bi-eye"></i> Task Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>Title:</strong> {{ $task->title }}</p>
+                <p><strong>Description:</strong> {{ $task->description }}</p>
+                <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
+                <p><strong>Status:</strong>
+                    <span class="badge bg-{{ $task->status == 'completed' ? 'success' : ($task->status == 'in_progress' ? 'primary' : 'warning text-dark') }}">
+                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+                    </span>
+                </p>
+                <p><strong>Student Note:</strong> {{ $task->student_note }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Task Modal -->
+        <div class="modal fade" id="editTaskModal{{ $task->id }}" tabindex="-1" aria-labelledby="editTaskModalLabel{{ $task->id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content card-modern">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel{{ $task->id }}"><i class="bi bi-pencil"></i> Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <form method="POST" action="{{ route('industry.tasks.update', $task->id) }}">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input type="text" name="title" class="form-control" value="{{ $task->title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Due Date</label>
+                        <input type="date" name="due_date" class="form-control" value="{{ $task->due_date }}">
+                    </div>
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <input type="text" name="description" class="form-control" value="{{ $task->description }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-indigo" type="submit">Update Task</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        @endforeach
+
+        <!-- Delete Confirmation Modal (only ONCE, outside the loop) -->
+        <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-modern">
+              <div class="modal-header">
+                <h5 class="modal-title text-danger text-center w-100 fw-bold" id="deleteTaskModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body text-center">
+                <p>Are you sure you want to delete this task?</p>
+                <form id="deleteTaskForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Edit Task Modal -->
-<div class="modal fade" id="editTaskModal{{ $task->id }}" tabindex="-1" aria-labelledby="editTaskModalLabel{{ $task->id }}" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content card-modern">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editTaskModalLabel{{ $task->id }}"><i class="bi bi-pencil"></i> Edit Task</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form method="POST" action="{{ route('industry.tasks.update', $task->id) }}">
-        @csrf
-        @method('PUT')
-        <div class="modal-body">
-            <div class="mb-3">
-                <label>Title</label>
-                <input type="text" name="title" class="form-control" value="{{ $task->title }}" required>
-            </div>
-            <div class="mb-3">
-                <label>Due Date</label>
-                <input type="date" name="due_date" class="form-control" value="{{ $task->due_date }}">
-            </div>
-            <div class="mb-3">
-                <label>Description</label>
-                <input type="text" name="description" class="form-control" value="{{ $task->description }}">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-indigo" type="submit">Update Task</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endforeach
-    </div>
-</div>
+@push('scripts') 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let deleteTaskModal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+    let deleteForm = document.getElementById('deleteTaskForm');
+    document.querySelectorAll('.delete-task-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            let taskId = this.getAttribute('data-task-id');
+            deleteForm.action = "{{ route('industry.tasks.destroy', ':id') }}".replace(':id', taskId);
+            deleteTaskModal.show();
+        });
+    });
+});
+</script>
+@endpush 
 @endsection

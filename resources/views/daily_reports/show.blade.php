@@ -95,22 +95,49 @@
             @endif
         </div>
     </div>
-    <div class="action-btns">
-        <a href="{{ route('daily-report.list') }}" class="btn btn-indigo">
-            <i class="bi bi-arrow-left"></i> Back to List
-        </a>
-        @if($report->status === 'submitted')
-        <a href="{{ route('daily-report.edit', $report->id) }}" class="btn btn-warning">
-            <i class="bi bi-pencil"></i> Edit
-        </a>
-        <form action="{{ route('daily-report.destroy', $report->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this report?');" style="display:inline;">
+   <div class="action-btns">
+    <a href="{{ route('daily-report.list') }}" class="btn btn-indigo">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    @if($report->status === 'submitted')
+    <a href="{{ route('daily-report.edit', $report->id) }}" class="btn btn-warning">
+        <i class="bi bi-pencil"></i> Edit
+    </a>
+    <button type="button" class="btn btn-danger" onclick="showDeleteConfirmModal('{{ route('daily-report.destroy', $report->id) }}')">
+        <i class="bi bi-trash"></i> Delete
+    </button>
+    @endif
+</div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form id="deleteConfirmForm" class="modal-content" method="POST" action="">
             @csrf
             @method('DELETE')
-            <button class="btn btn-danger" type="submit">
-                <i class="bi bi-trash"></i> Delete
-            </button>
+            <div class="modal-header border-0">
+                <h4 class="modal-title fw-bold w-100 text-center text-danger" id="deleteConfirmModalLabel">Confirm Deletion</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Are you sure you want to delete this report?</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="submit" class="btn" style="background:#ef4444;color:#fff;border-radius:8px;font-weight:600;width:100px;">Delete</button>
+                <button type="button" class="btn btn-secondary" style="border-radius:8px;width:100px;" data-bs-dismiss="modal">Cancel</button>
+            </div>
         </form>
-        @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+function showDeleteConfirmModal(action) {
+    document.getElementById('deleteConfirmForm').action = action;
+    var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    modal.show();
+}
+</script>
+@endpush
 @endsection

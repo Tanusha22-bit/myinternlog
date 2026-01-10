@@ -185,6 +185,9 @@
             <a href="{{ route('admin.communications.index') }}" class="nav-link{{ request()->routeIs('admin.communications.index') ? ' active' : '' }}">
                 <i class="bi bi-megaphone"></i> Communications
             </a>
+            <a href="{{ route('admin.history') }}" class="nav-link{{ request()->routeIs('admin.history') ? ' active' : '' }}">
+                <i class="bi bi-clock-history"></i> Internship History
+            </a>
             <a href="{{ route('admin.profile') }}" class="nav-link{{ request()->routeIs('admin.profile') ? ' active' : '' }}">
                 <i class="bi bi-person"></i> Profile
             </a>

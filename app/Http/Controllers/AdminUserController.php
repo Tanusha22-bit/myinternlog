@@ -84,53 +84,50 @@ class AdminUserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully!');
     }
 
-    public function update(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'role' => 'required|in:student,industry_sv,university_sv,admin',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'matric_id' => 'required_if:role,student',
-            'student_phone' => 'required_if:role,student',
-        ]);
+public function update(Request $request, User $user)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'student_id' => 'required_if:role,student',
+        'student_phone' => 'required_if:role,student',
+        'industry_sv_id' => 'required|exists:industry_supervisors,id',
+        'university_sv_id' => 'required|exists:university_supervisors,id',
+        'status' => 'required|in:active,completed,terminated',
+    ]);
 
-        $user->update($validated);
+    $user->update([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+    ]);
 
-        if ($user->role === 'student') {
-            $user->student()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'student_id' => $request->matric_id,
-                    'phone' => $request->student_phone,
-                ]
-            );
-        } elseif ($user->role === 'university_sv') {
-            $user->universitySupervisor()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'staff_id' => $request->staff_id,
-                    'department' => $request->department,
-                    'phone' => $request->university_phone,
-                ]
-            );
-        } elseif ($user->role === 'industry_sv') {
-            $user->industrySupervisor()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'position' => $request->position,
-                    'company' => $request->company,
-                    'phone' => $request->industry_phone,
-                ]
-            );
+    if ($user->role === 'student') {
+        $user->student()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'student_id' => $request->student_id,
+                'phone' => $request->student_phone,
+            ]
+        );
+
+        // Update internship
+        $internship = Internship::where('student_id', $user->student->id)->first();
+        if ($internship) {
+            $internship->update([
+                'industry_sv_id' => $request->industry_sv_id,
+                'university_sv_id' => $request->university_sv_id,
+                'status' => $request->status,
+            ]);
         }
-
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
     }
+
+    return back()->with('success', 'User updated successfully!');
+}
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+        return back()->with('success', 'User deleted successfully!');
     }
 
 public function assignSupervisorPage(Request $request)
@@ -138,11 +135,17 @@ public function assignSupervisorPage(Request $request)
     $search = $request->input('search');
     $status = $request->input('status');
 
-    $studentsQuery = User::where('role', 'student')
-        ->with([
-            'student.internship.industrySupervisor.user',
-            'student.internship.universitySupervisor.user'
-        ]);
+   $studentsQuery = User::where('role', 'student')
+    ->with([
+        'student.internship.industrySupervisor.user',
+        'student.internship.universitySupervisor.user'
+    ])
+    ->where(function ($q) {
+        $q->whereHas('student.internship', function ($q2) {
+            $q2->whereNotIn('status', ['completed', 'terminated']);
+        })
+        ->orWhereDoesntHave('student.internship');
+    });
 
     if ($search) {
         $studentsQuery->where(function ($query) use ($search) {
@@ -159,10 +162,12 @@ public function assignSupervisorPage(Request $request)
         });
     }
 
-    if ($status && in_array($status, ['active', 'completed', 'terminated'])) {
-        $studentsQuery->whereHas('student.internship', function ($q) use ($status) {
-            $q->where('status', $status);
-        });
+    if ($status === 'active') {
+    $studentsQuery->whereHas('student.internship', function ($q) {
+        $q->where('status', 'active');
+    });
+    } elseif ($status === 'pending') {
+    $studentsQuery->whereDoesntHave('student.internship');
     }
 
     $students = $studentsQuery->paginate(10);
@@ -170,15 +175,14 @@ public function assignSupervisorPage(Request $request)
     // Counts for cards
     $allCount = User::where('role', 'student')->count();
     $activeCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'active'); })->count();
-    $completedCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'completed'); })->count();
-    $terminatedCount = User::where('role', 'student')->whereHas('student.internship', function($q){ $q->where('status', 'terminated'); })->count();
+    $pendingCount = User::where('role', 'student')->whereDoesntHave('student.internship')->count();
 
     $industrySupervisors = User::where('role', 'industry_sv')->with('industrySupervisor')->get();
     $universitySupervisors = User::where('role', 'university_sv')->with('universitySupervisor')->get();
 
     return view('admin.assign-supervisor', compact(
         'students', 'industrySupervisors', 'universitySupervisors', 'search', 'status',
-        'allCount', 'activeCount', 'completedCount', 'terminatedCount'
+        'allCount', 'activeCount', 'pendingCount'
     ));
 }
 
@@ -246,4 +250,64 @@ public function assignSupervisorPage(Request $request)
 
     return view('admin.edit-assignment', compact('student', 'industrySupervisors', 'universitySupervisors'));
     }
+
+public function historyPage(Request $request)
+{
+    $search = $request->input('search');
+    $status = $request->input('status'); // <-- add this
+
+    $studentsQuery = User::where('role', 'student')
+        ->with([
+            'student.internship.industrySupervisor.user',
+            'student.internship.universitySupervisor.user'
+        ])
+        ->whereHas('student.internship', function ($q) use ($status) {
+            if ($status === 'completed') {
+                $q->where('status', 'completed');
+            } elseif ($status === 'terminated') {
+                $q->where('status', 'terminated');
+            } else {
+                $q->whereIn('status', ['completed', 'terminated']);
+            }
+        });
+
+    if ($search) {
+        $studentsQuery->where(function ($query) use ($search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhereHas('student', function ($q) use ($search) {
+                    $q->where('student_id', 'like', "%$search%");
+                })
+                ->orWhereHas('student.internship.industrySupervisor.user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                })
+                ->orWhereHas('student.internship.universitySupervisor.user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                });
+        });
+    }
+
+    $students = $studentsQuery->paginate(10);
+
+    // For cards (always count all, completed, terminated)
+    $allCount = User::where('role', 'student')
+        ->whereHas('student.internship', function ($q) {
+            $q->whereIn('status', ['completed', 'terminated']);
+        })->count();
+    $completedCount = User::where('role', 'student')
+        ->whereHas('student.internship', function ($q) {
+            $q->where('status', 'completed');
+        })->count();
+    $terminatedCount = User::where('role', 'student')
+        ->whereHas('student.internship', function ($q) {
+            $q->where('status', 'terminated');
+        })->count();
+
+    $industrySupervisors = User::where('role', 'industry_sv')->with('industrySupervisor')->get();
+    $universitySupervisors = User::where('role', 'university_sv')->with('universitySupervisor')->get();
+
+    return view('admin.history', compact(
+        'students', 'search', 'industrySupervisors', 'universitySupervisors',
+        'allCount', 'completedCount', 'terminatedCount', 'status'
+    ));
+}
 }

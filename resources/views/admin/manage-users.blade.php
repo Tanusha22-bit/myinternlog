@@ -14,25 +14,25 @@
 <div class="row mb-4">
     <div class="col">
         <div class="d-flex gap-3 justify-content-center flex-nowrap cards-row-scroll">
-            <a href="{{ route('admin.users.index', ['role' => 'all']) }}" class="filter-card card-modern card-all {{ ($role ?? 'all') === 'all' ? 'active' : '' }}">
-                <div class="fw-bold fs-5">All</div>
-                <div class="fs-4">{{ $counts['all'] }}</div>
+            <a href="{{ route('admin.users.index', ['role' => 'all']) }}" class="dashboard-card bg-indigo flex-fill text-center {{ ($role ?? 'all') === 'all' ? 'active' : '' }}">
+                <div class="fw-bold mb-1">All</div>
+                <div class="display-6">{{ $counts['all'] }}</div>
             </a>
-            <a href="{{ route('admin.users.index', ['role' => 'student']) }}" class="filter-card card-modern card-student {{ ($role ?? '') === 'student' ? 'active' : '' }}">
-                <div class="fw-bold fs-5">Students</div>
-                <div class="fs-4">{{ $counts['student'] }}</div>
+            <a href="{{ route('admin.users.index', ['role' => 'student']) }}" class="dashboard-card bg-green flex-fill text-center {{ ($role ?? '') === 'student' ? 'active' : '' }}">
+                <div class="fw-bold mb-1">Students</div>
+                <div class="display-6">{{ $counts['student'] }}</div>
             </a>
-            <a href="{{ route('admin.users.index', ['role' => 'university_sv']) }}" class="filter-card card-modern card-university {{ ($role ?? '') === 'university_sv' ? 'active' : '' }}">
-                <div class="fw-bold fs-5">University Supervisor</div>
-                <div class="fs-4">{{ $counts['university_sv'] }}</div>
+            <a href="{{ route('admin.users.index', ['role' => 'university_sv']) }}" class="dashboard-card bg-blue flex-fill text-center {{ ($role ?? '') === 'university_sv' ? 'active' : '' }}">
+                <div class="fw-bold mb-1">University Supervisor</div>
+                <div class="display-6">{{ $counts['university_sv'] }}</div>
             </a>
-            <a href="{{ route('admin.users.index', ['role' => 'industry_sv']) }}" class="filter-card card-modern card-industry {{ ($role ?? '') === 'industry_sv' ? 'active' : '' }}">
-                <div class="fw-bold fs-5">Industry Supervisor</div>
-                <div class="fs-4">{{ $counts['industry_sv'] }}</div>
+            <a href="{{ route('admin.users.index', ['role' => 'industry_sv']) }}" class="dashboard-card bg-yellow flex-fill text-center {{ ($role ?? '') === 'industry_sv' ? 'active' : '' }}">
+                <div class="fw-bold mb-1">Industry Supervisor</div>
+                <div class="display-6">{{ $counts['industry_sv'] }}</div>
             </a>
-            <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="filter-card card-modern card-admin {{ ($role ?? '') === 'admin' ? 'active' : '' }}">
-                <div class="fw-bold fs-5">Admin</div>
-                <div class="fs-4">{{ $counts['admin'] }}</div>
+            <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="dashboard-card bg-purple flex-fill text-center {{ ($role ?? '') === 'admin' ? 'active' : '' }}">
+                <div class="fw-bold mb-1">Admin</div>
+                <div class="display-6">{{ $counts['admin'] }}</div>
             </a>
         </div>
     </div>
@@ -279,76 +279,37 @@ table thead.custom-thead th {
 }
 .form-label { font-weight: bold; }
 .table th, .table td { vertical-align: middle; }
-.filter-card {
-    min-width: 170px;
-    max-width: 170px;
-    min-height: 90px;
-    max-height: 90px;
+.dashboard-card {
     border-radius: 22px;
-    cursor: pointer;
-    border: 2.5px solid transparent;
-    transition: border 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
-    text-decoration: none !important;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+    border: none;
+    padding: 2rem 1.5rem;
+    min-width: 160px;
+    max-width: 180px;
+    min-height: 100px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    font-weight: 500;
-    box-shadow: 0 2px 12px rgba(99,102,241,0.06);
-    text-align: center; /* <-- Add this line */
-}
-.filter-card .fw-bold {
+    align-items: center;
+    transition: box-shadow 0.2s, filter 0.2s;
     text-decoration: none !important;
-}
-.card-all {
-    background: #0F172A10;
-    color: #0F172A;
-    border-color: #0F172A;
-}
-.card-student {
-    background: #f0fdf4;
-    color: #22c55e;
-    border-color: #22c55e;
-}
-.card-university {
-    background: #f0f9ff;
-    color: #0ea5e9;
-    border-color: #0ea5e9;
-}
-.card-industry {
-    background: #fefce8;
-    color: #eab308;
-    border-color: #eab308;
-}
-.card-admin {
-    background: #ede9fe;
-    color: #6366F1;
-    border-color: #6366F1;
-}
-.filter-card.active.card-all,
-.filter-card:hover.card-all {
-    background: #0F172A !important;
     color: #fff !important;
 }
-.filter-card.active.card-student,
-.filter-card:hover.card-student {
-    background: #22c55e !important;
-    color: #fff !important;
+.bg-indigo { background: #6366F1 !important; }
+.bg-green { background: #22C55E !important; }
+.bg-blue { background: #0EA5E9 !important; }
+.bg-yellow { background: #FACC15 !important; color: #92400E !important; }
+.bg-purple { background: #a78bfa !important; }
+.dashboard-card .display-6 {
+    font-size: 2.2rem;
+    font-weight: 700;
 }
-.filter-card.active.card-university,
-.filter-card:hover.card-university {
-    background: #0ea5e9 !important;
-    color: #fff !important;
+.dashboard-card .fw-bold {
+    font-size: 1.1rem;
 }
-.filter-card.active.card-industry,
-.filter-card:hover.card-industry {
-    background: #eab308 !important;
-    color: #fff !important;
-}
-.filter-card.active.card-admin,
-.filter-card:hover.card-admin {
-    background: #6366F1 !important;
-    color: #fff !important;
+.dashboard-card.active, .dashboard-card:hover {
+    box-shadow: 0 8px 32px rgba(99,102,241,0.18);
+    filter: brightness(0.98);
 }
 .btn-search {
     background: #fde047;

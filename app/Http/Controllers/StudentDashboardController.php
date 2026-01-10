@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Document;
 
 class StudentDashboardController extends Controller
 {
@@ -23,15 +24,13 @@ class StudentDashboardController extends Controller
     $currentWeek = $start->diffInWeeks(now()) + 1;
     $progressPercent = min(100, max(0, intval(($currentWeek / $totalWeeks) * 100)));
 
-    // --- Add these lines for the new sections ---
-
-    // Important Dates (replace with your actual model/table)
+    // Important Dates 
     $importantDates = \DB::table('important_dates')
         ->where('for_students', true)
         ->orderBy('date')
         ->get();
 
-    // Downloadable Documents (replace with your actual model/table)
+    // Downloadable Documents
     $documents = \DB::table('documents')
         ->where('for_students', true)
         ->orderBy('created_at', 'desc')
@@ -41,12 +40,12 @@ class StudentDashboardController extends Controller
     $industrySupervisor = $internship ? $internship->industrySupervisor : null;
     $universitySupervisor = $internship ? $internship->universitySupervisor : null;
 
-    // Activity Feed (replace with your actual logic/model)
+    // Activity Feed 
     $activities = $internship
         ? \DB::table('activities')->where('student_id', $user->student->id)->orderBy('created_at', 'desc')->limit(10)->get()
         : collect();
 
-    // Announcements (replace with your actual model/table)
+    // Announcements 
     $announcements = \DB::table('announcements')
         ->where('for_students', true)
         ->orderBy('created_at', 'desc')

@@ -10,24 +10,19 @@
 
 <div class="d-flex gap-3 mb-4 justify-content-center flex-wrap flex-md-nowrap cards-row-scroll">
     <a href="{{ route('admin.assign-supervisor') }}"
-       class="filter-card status-all {{ !$status ? 'active' : '' }}">
-        <div class="fw-bold">All</div>
-        <div class="filter-count">{{ $allCount }}</div>
+       class="dashboard-card bg-indigo flex-fill text-center {{ !$status ? 'active' : '' }}" style="min-width:220px;">
+        <div class="fw-bold mb-1"><i class="bi bi-people"></i> All</div>
+        <div class="display-6">{{ $allCount }}</div>
     </a>
     <a href="{{ route('admin.assign-supervisor', ['status' => 'active']) }}"
-       class="filter-card status-active {{ $status == 'active' ? 'active' : '' }}">
-        <div class="fw-bold">Active</div>
-        <div class="filter-count">{{ $activeCount }}</div>
+       class="dashboard-card bg-green flex-fill text-center {{ $status == 'active' ? 'active' : '' }}" style="min-width:220px;">
+        <div class="fw-bold mb-1"><i class="bi bi-briefcase"></i> Active</div>
+        <div class="display-6">{{ $activeCount }}</div>
     </a>
-    <a href="{{ route('admin.assign-supervisor', ['status' => 'completed']) }}"
-       class="filter-card status-completed {{ $status == 'completed' ? 'active' : '' }}">
-        <div class="fw-bold">Completed</div>
-        <div class="filter-count">{{ $completedCount }}</div>
-    </a>
-    <a href="{{ route('admin.assign-supervisor', ['status' => 'terminated']) }}"
-       class="filter-card status-terminated {{ $status == 'terminated' ? 'active' : '' }}">
-        <div class="fw-bold">Terminated</div>
-        <div class="filter-count">{{ $terminatedCount }}</div>
+    <a href="{{ route('admin.assign-supervisor', ['status' => 'pending']) }}"
+       class="dashboard-card bg-yellow flex-fill text-center {{ $status == 'pending' ? 'active' : '' }}" style="min-width:220px;">
+        <div class="fw-bold mb-1"><i class="bi bi-hourglass-split"></i> Pending</div>
+        <div class="display-6">{{ $pendingCount }}</div>
     </a>
 </div>
 
@@ -217,82 +212,39 @@
     margin-top: 24px;
     font-weight: bold;
 }
-.filter-card {
+.dashboard-card {
+    border-radius: 22px;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+    background: #fff;
+    border: none;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-width: 140px;
-    min-height: 80px;
-    background: #fff;
-    border-radius: 24px;
-    text-decoration: none;
-    color: #222;
-    border: 3px solid transparent;
-    transition: border 0.2s, background 0.2s, color 0.2s;
+    align-items: center;
+    transition: box-shadow 0.2s;
+    text-decoration: none !important;
+}
+.bg-indigo { background: #6366F1; color: #fff !important; }
+.bg-green { background: #22C55E; color: #fff !important; }
+.bg-yellow { background: #FACC15; color: #92400E !important; }
+.dashboard-card .display-6 {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+.dashboard-card .fw-bold {
     font-size: 1.1rem;
 }
-.filter-card .filter-count {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-top: 2px;
+.dashboard-card.active, .dashboard-card:hover {
+    box-shadow: 0 8px 32px rgba(99,102,241,0.18);
+    filter: brightness(0.98);
 }
-.status-all {
-    border-color: #181e2a;
-    color: #181e2a;
-}
-.status-active {
-    border-color: #22c55e;
-    color: #22c55e;
-}
-.status-completed {
-    border-color: #2196f3;
-    color: #2196f3;
-}
-.status-terminated {
-    border-color: #ef4444;
-    color: #ef4444;
-}
-.status-all.active, .status-all:hover {
-    background: #181e2a !important;
-    color: #fff !important;
-}
-.status-all.active .fw-bold, .status-all.active .filter-count,
-.status-all:hover .fw-bold, .status-all:hover .filter-count {
-    color: #fff !important;
-}
-.status-active.active, .status-active:hover {
-    background: #22c55e !important;
-    color: #fff !important;
-}
-.status-active.active .fw-bold, .status-active.active .filter-count,
-.status-active:hover .fw-bold, .status-active:hover .filter-count {
-    color: #fff !important;
-}
-.status-completed.active, .status-completed:hover {
-    background: #2196f3 !important;
-    color: #fff !important;
-}
-.status-completed.active .fw-bold, .status-completed.active .filter-count,
-.status-completed:hover .fw-bold, .status-completed:hover .filter-count {
-    color: #fff !important;
-}
-.status-terminated.active, .status-terminated:hover {
-    background: #ef4444 !important;
-    color: #fff !important;
-}
-.status-terminated.active .fw-bold, .status-terminated.active .filter-count,
-.status-terminated:hover .fw-bold, .status-terminated:hover .filter-count {
-    color: #fff !important;
-}
-.status-active:not(.active):not(:hover) {
-    background: #f6fffa;
-}
-.status-completed:not(.active):not(:hover) {
-    background: #f6fbff;
-}
-.status-terminated:not(.active):not(:hover) {
-    background: #fff6f6;
+.dashboard-card:link,
+.dashboard-card:visited,
+.dashboard-card:hover,
+.dashboard-card:active {
+    text-decoration: none !important;
 }
 .cards-row-scroll {
     overflow-x: auto;

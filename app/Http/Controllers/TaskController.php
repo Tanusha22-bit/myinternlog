@@ -39,7 +39,7 @@ public function index(Request $request)
         $tasksQuery->where('status', $status);
     }
 
-    $tasks = $tasksQuery->get();
+    $tasks = $tasksQuery->paginate(10);
 
     return view('tasks.index', [
         'tasks' => $tasks,
@@ -86,6 +86,9 @@ public function index(Request $request)
     $industrySupervisor = DB::table('industry_supervisors')->where('user_id', $user->id)->first();
     $internship = DB::table('internships')->where('industry_sv_id', $industrySupervisor->id)->first();
 
+    $startDate = $internship ? $internship->start_date : null;
+    $endDate = $internship ? $internship->end_date : null;
+
     $status = $request->get('status', 'all');
     $baseQuery = $internship
         ? Task::where('internship_id', $internship->id)
@@ -114,9 +117,9 @@ public function index(Request $request)
         });
     }
 
-    $tasks = $tasksQuery->orderBy('due_date')->get();
+    $tasks = $tasksQuery->orderBy('due_date')->paginate(10);
 
-    return view('industry.tasks', compact('tasks', 'counts', 'status'));
+    return view('industry.tasks', compact('tasks', 'counts', 'status', 'startDate', 'endDate'));
     // Search functionality
     $search = $request->get('search');
 if ($search) {
@@ -136,7 +139,7 @@ public function industryStore(Request $request)
     $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
-        'due_date' => 'nullable|date',
+        'due_date' => "nullable|date|after_or_equal:$internship->start_date|before_or_equal:$internship->end_date",
     ]);
 
     $task = Task::create([
