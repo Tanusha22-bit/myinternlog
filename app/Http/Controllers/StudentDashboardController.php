@@ -40,11 +40,6 @@ class StudentDashboardController extends Controller
     $industrySupervisor = $internship ? $internship->industrySupervisor : null;
     $universitySupervisor = $internship ? $internship->universitySupervisor : null;
 
-    // Activity Feed 
-    $activities = $internship
-        ? \DB::table('activities')->where('student_id', $user->student->id)->orderBy('created_at', 'desc')->limit(10)->get()
-        : collect();
-
     // Announcements 
     $announcements = \DB::table('announcements')
         ->where('for_students', true)
@@ -57,8 +52,7 @@ class StudentDashboardController extends Controller
         'tasksPending', 'tasksInProgress', 'tasksCompleted',
         'progressPercent', 'currentWeek', 'totalWeeks',
         'importantDates', 'documents',
-        'industrySupervisor', 'universitySupervisor',
-        'activities', 'announcements'
+        'industrySupervisor', 'universitySupervisor','announcements'
     ));
 }
 }
