@@ -146,27 +146,31 @@
                     <option value="admin" @if($user->role=='admin') selected @endif>Admin</option>
                 </select>
                 <div id="editExtraFields{{ $user->id }}">
-                    @if($user->role == 'student' && $user->student)
-                        <label class="mb-1 form-label">Matric ID:</label>
-                        <input type="text" name="matric_id" class="form-control mb-3" value="{{ $user->student->student_id }}">
-                        <label class="mb-1 form-label">Phone:</label>
-                        <input type="text" name="student_phone" class="form-control mb-3" value="{{ $user->student->phone }}">
-                    @elseif($user->role == 'university_sv' && $user->universitySupervisor)
-                        <label class="mb-1 form-label">Staff ID:</label>
-                        <input type="text" name="staff_id" class="form-control mb-3" value="{{ $user->universitySupervisor->staff_id }}">
-                        <label class="mb-1 form-label">Department:</label>
-                        <input type="text" name="department" class="form-control mb-3" value="{{ $user->universitySupervisor->department }}">
-                        <label class="mb-1 form-label">Phone:</label>
-                        <input type="text" name="university_phone" class="form-control mb-3" value="{{ $user->universitySupervisor->phone }}">
-                    @elseif($user->role == 'industry_sv' && $user->industrySupervisor)
-                        <label class="mb-1 form-label">Position:</label>
-                        <input type="text" name="position" class="form-control mb-3" value="{{ $user->industrySupervisor->position }}">
-                        <label class="mb-1 form-label">Company:</label>
-                        <input type="text" name="company" class="form-control mb-3" value="{{ $user->industrySupervisor->company }}">
-                        <label class="mb-1 form-label">Phone:</label>
-                        <input type="text" name="industry_phone" class="form-control mb-3" value="{{ $user->industrySupervisor->phone }}">
-                    @endif
-                </div>
+    @if($user->role == 'student' && $user->student)
+        <label class="mb-1 form-label">Matric ID:</label>
+        <input type="text" name="student_id" class="form-control mb-3" value="{{ $user->student->student_id }}" required>
+        <label class="mb-1 form-label">Program:</label>
+        <input type="text" name="program" class="form-control mb-3" value="{{ $user->student->program }}" required>
+        <label class="mb-1 form-label">Semester:</label>
+        <input type="text" name="semester" class="form-control mb-3" value="{{ $user->student->semester }}" required>
+        <label class="mb-1 form-label">Phone:</label>
+        <input type="text" name="student_phone" class="form-control mb-3" value="{{ $user->student->phone }}">
+    @elseif($user->role == 'university_sv' && $user->universitySupervisor)
+        <label class="mb-1 form-label">Staff ID:</label>
+        <input type="text" name="staff_id" class="form-control mb-3" value="{{ $user->universitySupervisor->staff_id }}" required>
+        <label class="mb-1 form-label">Department:</label>
+        <input type="text" name="department" class="form-control mb-3" value="{{ $user->universitySupervisor->department }}" required>
+        <label class="mb-1 form-label">Phone:</label>
+        <input type="text" name="university_phone" class="form-control mb-3" value="{{ $user->universitySupervisor->phone }}">
+    @elseif($user->role == 'industry_sv' && $user->industrySupervisor)
+        <label class="mb-1 form-label">Position:</label>
+        <input type="text" name="position" class="form-control mb-3" value="{{ $user->industrySupervisor->position }}" required>
+        <label class="mb-1 form-label">Company:</label>
+        <input type="text" name="company" class="form-control mb-3" value="{{ $user->industrySupervisor->company }}" required>
+        <label class="mb-1 form-label">Phone:</label>
+        <input type="text" name="industry_phone" class="form-control mb-3" value="{{ $user->industrySupervisor->phone }}">
+    @endif
+</div>
                 <label class="mb-1 form-label">Email:</label>
                 <input type="email" name="email" class="form-control mb-3" value="{{ $user->email }}" required>
             </div>
@@ -353,15 +357,14 @@ table thead.custom-thead th {
     // Show/hide extra fields based on role selection (Add User)
     document.querySelectorAll('.user-role-select').forEach(function(select) {
         select.addEventListener('change', function() {
-            var targetId = this.getAttribute('data-target');
-            var target = document.querySelector(targetId);
+            var target = document.querySelector(this.getAttribute('data-target'));
             if (!target) return;
             var role = this.value;
             let html = '';
             if (role === 'student') {
                 html = `
                     <label class="mb-1 form-label">Matric ID:</label>
-                    <input type="text" name="matric_id" class="form-control mb-3" required>
+                    <input type="text" name="student_id" class="form-control mb-3" required>
                     <label class="mb-1 form-label">Program:</label>
                     <input type="text" name="program" class="form-control mb-3" required>
                     <label class="mb-1 form-label">Semester:</label>
@@ -400,7 +403,7 @@ table thead.custom-thead th {
         }
     });
 
-    // Edit User Modal dynamic fields (optional: for role change in edit modal)
+    // Edit User Modal dynamic fields (for role change in edit modal)
     document.querySelectorAll('.user-role-select-edit').forEach(function(select) {
         select.addEventListener('change', function() {
             var userId = this.getAttribute('data-user');
@@ -411,7 +414,7 @@ table thead.custom-thead th {
             if (role === 'student') {
                 html = `
                     <label class="mb-1 form-label">Matric ID:</label>
-                    <input type="text" name="matric_id" class="form-control mb-3" required>
+                    <input type="text" name="student_id" class="form-control mb-3" required>
                     <label class="mb-1 form-label">Program:</label>
                     <input type="text" name="program" class="form-control mb-3" required>
                     <label class="mb-1 form-label">Semester:</label>
@@ -443,11 +446,11 @@ table thead.custom-thead th {
     });
 
     function showDeleteModal(actionUrl) {
-    const form = document.getElementById('deleteUserForm');
-    form.action = actionUrl;
-    var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-    modal.show();
-}
+        const form = document.getElementById('deleteUserForm');
+        form.action = actionUrl;
+        var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        modal.show();
+    }
 </script>
 @endpush
 @endsection

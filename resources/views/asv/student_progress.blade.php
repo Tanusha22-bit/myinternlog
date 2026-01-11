@@ -37,19 +37,29 @@
     .progress-action-btn.bg-indigo:hover {
         background: #4F46E5;
     }
-    .btn-pill {
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 1rem;
-        padding: 0.4rem 1.2rem;
-        border: none;
-        background: #6366F1;
-        color: #fff !important;
-        transition: background 0.2s;
-    }
-    .btn-pill:hover {
-        background: #4F46E5;
-    }
+    .btn-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: transparent;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    margin-right: 8px;
+    padding: 0;
+}
+
+.btn-icon.btn-view {
+    color: #6366F1;
+    border-color: #6366F1;
+}
+.btn-icon.btn-view:hover, .btn-icon.btn-view:focus {
+    background: #6366F1;
+    color: #fff;
+}
     .progress-action-btn.sm {
         font-size: 1rem;
         padding: 0.4rem 1.2rem;
@@ -78,7 +88,7 @@
 
 @section('content')
 <div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Student <span class="brand-highlight">Progress</span></h2>
+    <h2 class="me-auto mb-0"><i class="bi bi-graph-up"></i>Student <span class="brand-highlight">Progress</span></h2>
 </div>
 
 <!-- Analytics Cards -->
@@ -186,7 +196,7 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{{ route('supervisor.university.student.reports', $data['student']->id) }}" class="btn-pill">
+                        <a href="{{ route('supervisor.university.student.reports', $data['student']->id) }}" class="btn-icon btn-view" title="View">
                             <i class="bi bi-eye"></i>
                         </a>
                     </td>
@@ -256,14 +266,14 @@ document.addEventListener('DOMContentLoaded', function () {
 const statusChart = new Chart(document.getElementById('statusChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Active', 'Completed', 'Inactive'],
+        labels: ['Active', 'Completed', 'Terminated'],
         datasets: [{
             data: [
                 {{ $statusCounts['active'] }},
                 {{ $statusCounts['completed'] }},
-                {{ $statusCounts['inactive'] }}
+                {{ $statusCounts['inactive'] }} 
             ],
-            backgroundColor: ['#22C55E', '#0EA5E9', '#FACC15'],
+            backgroundColor: ['#22C55E', '#0EA5E9', '#EF4444'], 
         }]
     }
 });

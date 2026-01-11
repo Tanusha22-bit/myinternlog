@@ -24,7 +24,7 @@
     }
     .label-purple {
         color: #6366F1;
-        font-weight: 600;
+        font-weight: 700;
     }
     .icon-purple {
         color: #6366F1;
@@ -59,6 +59,12 @@
             <p>
                 <span class="label-purple">Date:</span> {{ $report->report_date }}<br>
                 <span class="label-purple">Task:</span> {{ $report->task }}<br>
+                    <span class="label-purple">University Supervisor Feedback:</span>
+                    @if($report->uni_feedback)
+                        <span>{{ $report->uni_feedback }}</span>
+                    @else
+                        <span class="text-muted">No feedback</span>
+                    @endif <br>
                 <span class="label-purple">Attachment:</span>
                 @if($report->file)
                     <a href="{{ asset('storage/'.$report->file) }}" target="_blank" class="text-success">
@@ -81,7 +87,7 @@
 </div>
 
 <div class="card-modern">
-    <h5 class="mb-3">Supervisor Feedback</h5>
+    <h5 class="mb-3">Industry Supervisor Feedback</h5>
     @if(!$report->industry_feedback)
         <form method="POST" action="{{ route('industry.reports.feedback', $report->id) }}">
             @csrf

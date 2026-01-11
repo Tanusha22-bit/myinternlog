@@ -86,22 +86,28 @@ class AdminUserController extends Controller
 
 public function update(Request $request, User $user)
 {
-    $validated = $request->validate([
+    $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $user->id,
-        'student_id' => 'required_if:role,student',
-        'student_phone' => 'required_if:role,student',
-        'industry_sv_id' => 'required|exists:industry_supervisors,id',
-        'university_sv_id' => 'required|exists:university_supervisors,id',
-        'status' => 'required|in:active,completed,terminated',
-    ]);
+    ];
+
+    if ($request->role === 'student') {
+        $rules['student_id'] = 'required';
+        $rules['student_phone'] = 'required';
+        $rules['industry_sv_id'] = 'required|exists:industry_supervisors,id';
+        $rules['university_sv_id'] = 'required|exists:university_supervisors,id';
+        $rules['status'] = 'required|in:active,completed,terminated';
+    }
+
+    $validated = $request->validate($rules);
 
     $user->update([
         'name' => $validated['name'],
         'email' => $validated['email'],
+        'role' => $request->role, // In case role is changed
     ]);
 
-    if ($user->role === 'student') {
+    if ($request->role === 'student') {
         $user->student()->updateOrCreate(
             ['user_id' => $user->id],
             [

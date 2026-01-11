@@ -9,28 +9,83 @@
         color: #fff;
         border: none;
     }
-    .btn-indigo {
-        background: #6366F1;
-        color: #fff !important;
-        border: none;
-        border-radius: 999px;
-        font-weight: 500;
-        transition: background 0.2s;
-    }
-    .btn-indigo:hover, .btn-indigo:focus {
-        background: #4F46E5;
-        color: #fff !important;
-    }
-        .btn-warning-custom {
-        background: #FBBF24;
-        color: #0F172A !important;
-    }
-    .btn-warning-custom:hover { background: #F59E42; color: #fff !important; }
-    .card-modern {
-        border-radius: 18px;
-        box-shadow: 0 2px 16px rgba(99,102,241,0.08);
-        background: #fff;
-    }
+    /* Circular icon buttons */
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: transparent;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    margin-right: 8px;
+    padding: 0;
+}
+
+.btn-icon.btn-view {
+    color: #6366F1;
+    border-color: #6366F1;
+}
+.btn-icon.btn-view:hover, .btn-icon.btn-view:focus {
+    background: #6366F1;
+    color: #fff;
+}
+
+.btn-icon.btn-edit {
+    color: #fbbf24;
+    border-color: #fbbf24;
+}
+.btn-icon.btn-edit:hover, .btn-icon.btn-edit:focus {
+    background: #fbbf24;
+    color: #fff;
+}
+
+.btn-icon.btn-delete {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+.btn-icon.btn-delete:hover, .btn-icon.btn-delete:focus {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Card styles */
+.card-modern-green {
+    background: #22c55e;
+    border-radius: 28px;
+    box-shadow: 0 4px 24px rgba(16,185,129,0.10);
+    border: none;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: box-shadow 0.2s;
+    color: #fff !important;
+}
+.card-modern-green .fw-bold { color: #fff; }
+.card-modern-green .display-6 { font-size: 2.2rem; font-weight: 700; color: #fff; }
+
+.card-modern-yellow {
+    background: #fbbf24;
+    border-radius: 28px;
+    box-shadow: 0 4px 24px rgba(251,191,36,0.10);
+    border: none;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: box-shadow 0.2s;
+    color: #fff !important;
+}
+.card-modern-yellow .fw-bold { color: #fff; }
+.card-modern-yellow .display-6 { font-size: 2.2rem; font-weight: 700; color: #fff; }
     #studentDetailsContent strong {
         color: #6366F1;
         font-weight: 600;
@@ -60,25 +115,25 @@
 @section('content')
 @stack('scripts')
 <div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Student <span class="brand-highlight">List</span></h2>
+    <h2 class="me-auto mb-0"><i class="bi bi-people"></i> Student <span class="brand-highlight">List</span></h2>
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card card-modern text-center p-3 filter-card {{ !$statusFilter ? 'border-primary shadow' : '' }}" style="cursor:pointer;" onclick="window.location='{{ route('supervisor.university.students') }}'">
-            <div class="fw-bold text-primary mb-1"><i class="bi bi-people"></i> All Students</div>
-            <div class="display-6">{{ $allCount }}</div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card card-modern text-center p-3 filter-card {{ $statusFilter === 'active' ? 'border-success shadow' : '' }}" style="cursor:pointer;" onclick="window.location='?status=active'">
-            <div class="fw-bold text-success mb-1"><i class="bi bi-person-check"></i> Active Students</div>
+    <div class="col-md-6 mb-3 mb-md-0">
+        <div class="card-modern-green text-center w-100" style="cursor:pointer;" onclick="window.location='{{ route('supervisor.university.students') }}'">
+            <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                <i class="bi bi-person-check" style="font-size:1.5rem;vertical-align:middle;"></i>
+                Active Students
+            </div>
             <div class="display-6">{{ $activeCount }}</div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card card-modern text-center p-3 filter-card {{ $statusFilter === 'inactive' ? 'border-warning shadow' : '' }}" style="cursor:pointer;" onclick="window.location='?status=inactive'">
-            <div class="fw-bold text-secondary mb-1"><i class="bi bi-person-x"></i> Inactive Students</div>
+    <div class="col-md-6">
+        <div class="card-modern-yellow text-center w-100" style="cursor:pointer;" onclick="window.location='{{ route('supervisor.university.history') }}'">
+            <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                <i class="bi bi-person-x" style="font-size:1.5rem;vertical-align:middle;"></i>
+                Inactive Students
+            </div>
             <div class="display-6">{{ $inactiveCount }}</div>
         </div>
     </div>
@@ -109,12 +164,12 @@
                     </td>
                     <td>{{ $student->company_name }}</td>
                     <td>
-                        <button class="btn btn-indigo btn-sm view-details-btn" data-id="{{ $student->id }}">
-                            <i class="bi bi-eye"></i> 
+                        <button class="btn-icon btn-view view-details-btn" data-id="{{ $student->id }}" title="View">
+                            <i class="bi bi-eye"></i>
                         </button>
-                            <a href="{{ route('supervisor.university.student.reports', $student->id) }}" class="btn btn-warning-custom btn-sm">
-                            <i class="bi bi-journal-text"></i> 
-                            </a>
+                        <a href="{{ route('supervisor.university.student.reports', $student->id) }}" class="btn-icon btn-edit" title="Reports">
+                            <i class="bi bi-journal-text"></i>
+                        </a>
                     </td>
                 </tr>
                 @endforeach

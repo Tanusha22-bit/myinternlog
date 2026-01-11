@@ -25,6 +25,105 @@
     }
     .btn-purple:hover { background: #4F46E5; }
     .modal { z-index: 2000; }
+    .card-modern-purple {
+    background: #6366F1;
+    border-radius: 28px;
+    color: #fff !important;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+    border: none;
+}
+.card-modern-green {
+    background: #22C55E;
+    border-radius: 28px;
+    color: #fff !important;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(16,185,129,0.10);
+    border: none;
+}
+.card-modern-yellow {
+    background: #fbbf24;
+    border-radius: 28px;
+    color: #fff !important;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(251,191,36,0.10);
+    border: none;
+}
+.card-modern-gray {
+    background: #a1a1aa;
+    border-radius: 28px;
+    color: #fff !important;
+    padding: 2rem 1.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(161,161,170,0.10);
+    border: none;
+}
+
+/* Action buttons */
+.btn-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: transparent;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    margin-right: 8px;
+    padding: 0;
+}
+.btn-icon.btn-edit {
+    color: #fbbf24;
+    border-color: #fbbf24;
+}
+.btn-icon.btn-edit:hover, .btn-icon.btn-edit:focus {
+    background: #fbbf24;
+    color: #fff;
+}
+.btn-icon.btn-delete {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+.btn-icon.btn-delete:hover, .btn-icon.btn-delete:focus {
+    background: #ef4444;
+    color: #fff;
+}
+.btn-icon.btn-view {
+    color: #6366F1;
+    border-color: #6366F1;
+}
+.btn-icon.btn-view:hover, .btn-icon.btn-view:focus {
+    background: #6366F1;
+    color: #fff;
+}
+.btn-icon.btn-edit:disabled, .btn-icon.btn-edit.disabled {
+    color: #a1a1aa !important;
+    border-color: #a1a1aa !important;
+    background: #f3f4f6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
 </style>
 @endsection
 
@@ -37,25 +136,28 @@
 
 <div class="row g-3 mb-4">
     @php
-        $statuses = [
-            'all' => ['label' => 'All', 'color' => 'secondary', 'icon' => 'bi-list-task'],
-            'completed' => ['label' => 'Completed', 'color' => 'success', 'icon' => 'bi-check-circle'],
-            'in_progress' => ['label' => 'In Progress', 'color' => 'primary', 'icon' => 'bi-hourglass-split'],
-            'pending' => ['label' => 'Pending', 'color' => 'warning text-dark', 'icon' => 'bi-clock'],
-        ];
-    @endphp
+    $statuses = [
+        'all' => ['label' => 'All', 'class' => 'card-modern-purple', 'icon' => 'bi-list-task'],
+        'completed' => ['label' => 'Completed', 'class' => 'card-modern-green', 'icon' => 'bi-check-circle'],
+        'in_progress' => ['label' => 'In Progress', 'class' => 'card-modern-yellow', 'icon' => 'bi-hourglass-split'],
+        'pending' => ['label' => 'Pending', 'class' => 'card-modern-gray', 'icon' => 'bi-clock'],
+    ];
+@endphp
+<div class="row g-3 mb-4">
     @foreach($statuses as $key => $info)
     <div class="col-md-3">
         <a href="{{ route('industry.tasks', ['status' => $key]) }}" style="text-decoration:none;">
-            <div class="card-modern p-3 text-center {{ $status == $key ? 'border border-'.$info['color'].' border-3' : '' }}">
-                <div class="fw-bold mb-1 text-{{ $info['color'] }}">
-                    <i class="bi {{ $info['icon'] }}"></i> {{ $info['label'] }}
+            <div class="{{ $info['class'] }} text-center w-100 {{ $status == $key ? 'shadow' : '' }}">
+                <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                    <i class="bi {{ $info['icon'] }}" style="font-size:1.5rem;vertical-align:middle;"></i>
+                    {{ $info['label'] }}
                 </div>
-                <div class="display-6 text-{{ $info['color'] }}">{{ $counts[$key] ?? 0 }}</div>
+                <div class="display-6">{{ $counts[$key] ?? 0 }}</div>
             </div>
         </a>
     </div>
     @endforeach
+</div>
 </div>
 
 <div class="d-flex align-items-center justify-content-between gap-3 mb-3 flex-wrap">
@@ -121,29 +223,41 @@
                     <td>{{ $task->title }}</td>
                     <td>{{ $task->due_date }}</td>
                     <td>
-                        <span class="badge bg-{{ $task->status == 'completed' ? 'success' : ($task->status == 'in_progress' ? 'primary' : 'warning text-dark') }}">
-                            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+                        <span class="badge"
+                            style="
+                            background:
+                                {{ $task->status == 'completed' ? '#22C55E'
+                                : ($task->status == 'in_progress' ? '#fbbf24'
+                                : ($task->status == 'pending' ? '#a1a1aa'
+                                : '#6366F1')) }};
+                            color:
+                                {{ $task->status == 'in_progress' ? '#92400E'
+                                : ($task->status == 'pending' ? '#fff'
+                                : '#fff') }};
+                                font-weight:600;
+                                font-size:1em;
+                                ">
+                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
                         </span>
                     </td>
                     <td>{{ $task->student_note }}</td>
                     <td>
-                        @if($task->status !== 'completed')
-                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ $task->id }}">
-                            <i class="bi bi-pencil"></i>
+                        <button class="btn-icon btn-view" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}" title="View">
+                        <i class="bi bi-eye"></i>
                         </button>
-                        @else
-                        <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-pencil"></i></button>
-                        @endif
+                        <button class="btn-icon btn-edit {{ $task->status === 'completed' ? 'disabled' : '' }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editTaskModal{{ $task->id }}"
+                            {{ $task->status === 'completed' ? 'disabled' : '' }}
+                            title="Edit">
+                        <i class="bi bi-pencil"></i>
+                        </button>
                         <form action="{{ route('industry.tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
                             @csrf @method('DELETE')
-                            <button type="button" class="btn btn-sm btn-danger delete-task-btn" data-task-id="{{ $task->id }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                        <!-- View Button -->
-                        <button class="btn btn-sm  btn-purple" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}">
-                            <i class="bi bi-eye"></i>
+                        <button type="button" class="btn-icon btn-delete delete-task-btn" data-task-id="{{ $task->id }}" title="Delete">
+                        <i class="bi bi-trash"></i>
                         </button>
+                        </form>
                     </td>
                 </tr>
                 @empty
@@ -169,9 +283,22 @@
                 <p><strong>Description:</strong> {{ $task->description }}</p>
                 <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
                 <p><strong>Status:</strong>
-                    <span class="badge bg-{{ $task->status == 'completed' ? 'success' : ($task->status == 'in_progress' ? 'primary' : 'warning text-dark') }}">
+                        <span class="badge"
+                            style="
+                            background:
+                                {{ $task->status == 'completed' ? '#22C55E'
+                                : ($task->status == 'in_progress' ? '#fbbf24'
+                                : ($task->status == 'pending' ? '#a1a1aa'
+                                : '#6366F1')) }};
+                            color:
+                                {{ $task->status == 'in_progress' ? '#92400E'
+                                : ($task->status == 'pending' ? '#fff'
+                                : '#fff') }};
+                                font-weight:600;
+                                font-size:1em;
+                                ">
                         {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                    </span>
+                        </span>
                 </p>
                 <p><strong>Student Note:</strong> {{ $task->student_note }}</p>
               </div>

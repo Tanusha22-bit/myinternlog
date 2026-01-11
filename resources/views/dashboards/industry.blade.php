@@ -93,6 +93,13 @@
 .badge.blink-pending {
     animation: blink 1s steps(2, start) infinite;
 }
+.badge-small {
+    font-size: 0.85em !important;
+    padding: 3px 12px !important;
+    border-radius: 8px !important;
+    font-weight: 600;
+    margin-left: 10px;
+}
 @keyframes blink {
     to { visibility: hidden; }
 }
@@ -158,9 +165,9 @@
     <li>
         <strong>{{ $report->report_date }}</strong> - {{ \Illuminate\Support\Str::limit($report->task, 30) }}
         @if($report->industry_feedback)
-            <span class="badge bg-success">Given</span>
+            <span class="badge bg-success badge-small">Given</span>
         @else
-            <span class="badge bg-warning blink-pending">Pending</span>
+            <span class="badge bg-warning badge-small">Pending</span>
         @endif
     </li>
 @endforeach

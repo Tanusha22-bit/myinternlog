@@ -23,31 +23,90 @@
     .rounded-pill {
         border-radius: 999px !important;
     }
-    .btn-square {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px !important;
-    font-size: 1.3rem;
-}
-.btn-purple {
-    background: #6366F1;
-    color: #fff !important;
-    border: none;
-    transition: background 0.2s;
-}
-.btn-purple:hover { background: #4F46E5; }
-.btn-grey {
-    background: #bdbdbd;
-    color: #fff !important;
+    .card-modern-purple {
+        background: #6366F1;
+        border-radius: 28px;
+        color: #fff !important;
+        padding: 2rem 1.5rem;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+        border: none;
+    }
+    .table thead th {
+    background: #0F172A;
+    color: #fff;
     border: none;
 }
-.btn-grey:disabled, .btn-grey[disabled] {
-    opacity: 0.7;
-}
+    .card-modern-yellow {
+        background: #fbbf24;
+        border-radius: 28px;
+        color: #fff !important;
+        padding: 2rem 1.5rem;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 24px rgba(251,191,36,0.10);
+        border: none;
+    }
+    .card-modern-green {
+        background: #22C55E;
+        border-radius: 28px;
+        color: #fff !important;
+        padding: 2rem 1.5rem;
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 24px rgba(16,185,129,0.10);
+        border: none;
+    }
+
+    /* Action buttons */
+    .btn-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2px solid;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        background: transparent;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+        margin-right: 8px;
+        padding: 0;
+    }
+    .btn-icon.btn-view {
+        color: #6366F1;
+        border-color: #6366F1;
+    }
+    .btn-icon.btn-view:hover, .btn-icon.btn-view:focus {
+        background: #6366F1;
+        color: #fff;
+    }
+    .btn-icon.btn-edit {
+        color: #fbbf24;
+        border-color: #fbbf24;
+    }
+    .btn-icon.btn-edit:hover, .btn-icon.btn-edit:focus {
+        background: #fbbf24;
+        color: #fff;
+    }
+    .btn-icon.btn-edit:disabled, .btn-icon.btn-edit.disabled {
+        color: #a1a1aa !important;
+        border-color: #a1a1aa !important;
+        background: #f3f4f6 !important;
+        cursor: not-allowed !important;
+        pointer-events: none;
+    }
+    
 </style>
 @endsection
 
@@ -58,26 +117,39 @@
 @endif
 
 <div class="row g-3 mb-4">
-    @php
-        $statuses = [
-            'all' => ['label' => 'All Reports', 'color' => 'primary', 'icon' => 'bi-clipboard-data'],
-            'pending' => ['label' => 'Pending', 'color' => 'warning text-dark', 'icon' => 'bi-hourglass-split'],
-            'given' => ['label' => 'Given', 'color' => 'success', 'icon' => 'bi-check-circle'],
-        ];
-        $currentStatus = $status;
-    @endphp
-    @foreach($statuses as $key => $info)
     <div class="col-md-4">
-        <a href="{{ route('industry.reports', ['status' => $key]) }}" style="text-decoration:none;">
-            <div class="card-modern p-3 text-center {{ $currentStatus == $key ? 'border border-'.$info['color'].' border-3' : '' }}">
-                <div class="fw-bold mb-1 text-{{ $info['color'] }}">
-                    <i class="bi {{ $info['icon'] }}"></i> {{ $info['label'] }}
+        <a href="{{ route('industry.reports', ['status' => 'all']) }}" style="text-decoration:none;">
+            <div class="card-modern-purple text-center w-100 {{ $status == 'all' ? 'shadow' : '' }}">
+                <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                    <i class="bi bi-clipboard-data" style="font-size:1.5rem;vertical-align:middle;"></i>
+                    All Reports
                 </div>
-                <div class="display-6 text-{{ $info['color'] }}">{{ $counts[$key] ?? 0 }}</div>
+                <div class="display-6">{{ $counts['all'] ?? 0 }}</div>
             </div>
         </a>
     </div>
-    @endforeach
+    <div class="col-md-4">
+        <a href="{{ route('industry.reports', ['status' => 'pending']) }}" style="text-decoration:none;">
+            <div class="card-modern-yellow text-center w-100 {{ $status == 'pending' ? 'shadow' : '' }}">
+                <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                    <i class="bi bi-hourglass-split" style="font-size:1.5rem;vertical-align:middle;"></i>
+                    Pending
+                </div>
+                <div class="display-6">{{ $counts['pending'] ?? 0 }}</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ route('industry.reports', ['status' => 'given']) }}" style="text-decoration:none;">
+            <div class="card-modern-green text-center w-100 {{ $status == 'given' ? 'shadow' : '' }}">
+                <div class="fw-bold mb-1" style="font-size:1.2rem;">
+                    <i class="bi bi-check-circle" style="font-size:1.5rem;vertical-align:middle;"></i>
+                    Given
+                </div>
+                <div class="display-6">{{ $counts['given'] ?? 0 }}</div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <div class="d-flex align-items-center justify-content-end gap-2 mb-3 flex-wrap">
@@ -103,26 +175,32 @@
                 <tr>
                     <td>{{ $report->report_date }}</td>
                     <td>
-                        <span class="badge bg-{{ $report->industry_feedback ? 'success' : 'warning text-dark' }}">
+                        <span class="badge"
+                            style="
+                                background: {{ $report->industry_feedback ? '#22C55E' : '#fbbf24' }};
+                                color: {{ $report->industry_feedback ? '#fff' : '#92400E' }};
+                                font-weight:600;
+                                font-size:1em;
+                            ">
                             {{ $report->industry_feedback ? 'Given' : 'Pending' }}
                         </span>
                     </td>
                     <td>
-    <div class="d-flex gap-2">
-        <a href="{{ route('industry.reports.show', $report->id) }}" class="btn btn-square btn-purple">
-            <i class="bi bi-eye"></i>
-        </a>
-        @if($report->industry_feedback)
-            <button class="btn btn-square btn-warning" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ $report->id }}">
-                <i class="bi bi-pencil"></i>
-            </button>
-        @else
-            <button class="btn btn-square btn-grey" disabled>
-                <i class="bi bi-pencil"></i>
-            </button>
-        @endif
-    </div>
-</td>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('industry.reports.show', $report->id) }}" class="btn-icon btn-view" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        @if($report->industry_feedback)
+                            <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#feedbackModal{{ $report->id }}" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        @else
+                        <button class="btn-icon btn-edit disabled" disabled title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        @endif
+                        </div>
+                    </td>
                 </tr>
                 @empty
                 <tr><td colspan="3" class="text-center text-muted">No reports found.</td></tr>
@@ -153,66 +231,45 @@
             </div>
             <div class="modal-footer d-flex justify-content-center gap-3">
                 <button class="btn btn-indigo px-5" type="submit">Save</button>
-                <button class="btn btn-danger px-5" type="button" onclick="if(confirm('Delete feedback?')){ this.form.industry_feedback.value=''; this.form.submit(); }">Delete</button>
+                <button type="button" class="btn btn-danger px-5" onclick="showDeleteConfirm({{ $report->id }})">Delete</button>
             </div>
           </form>
         </div>
       </div>
     </div>
-    <!-- View Modal -->
-    <div class="modal fade" id="viewReportModal{{ $report->id }}" tabindex="-1" aria-labelledby="viewReportModalLabel{{ $report->id }}" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content card-modern">
-          <div class="modal-header">
-            <h5 class="modal-title" id="viewReportModalLabel{{ $report->id }}">
-                <i class="bi bi-eye"></i> Report Details
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-                <h5>
-                    <i class="bi bi-person"></i>
-                    <strong>{{ $report->student_name ?? 'Student' }}</strong>
-                    <span class="text-muted">({{ $report->student_matric ?? '' }})</span>
-                </h5>
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                        <strong class="text-primary">Date:</strong> {{ $report->report_date }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong class="text-primary">Status:</strong>
-                        @if($report->industry_feedback)
-                            <span class="badge bg-success">Given</span>
-                        @else
-                            <span class="badge bg-warning text-dark">Pending</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <strong class="text-primary">Task:</strong> {{ $report->task }}
-                </div>
-                <div class="mb-2">
-                    <strong class="text-primary">Attachment:</strong>
-                    @if($report->file)
-                        <a href="{{ asset('storage/'.$report->file) }}" target="_blank" class="text-success">
-                            <i class="bi bi-paperclip"></i> Download file
-                        </a>
-                    @else
-                        <span class="text-danger"><i class="bi bi-x-circle"></i> No file attached</span>
-                    @endif
-                </div>
-                <div class="mb-2">
-                    <strong>Supervisor Feedback:</strong>
-                    <div class="border rounded p-2 bg-light">
-                        {{ $report->industry_feedback ?? '-' }}
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     @endforeach
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header border-0">
+        <h4 class="modal-title w-100 text-danger fw-bold" id="deleteConfirmModalLabel">Confirm Deletion</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">Are you sure you want to delete this feedback?</div>
+        <form id="deleteFeedbackForm" method="POST" action="">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger px-4">Delete</button>
+            <button type="button" class="btn btn-secondary ms-2 px-4" data-bs-dismiss="modal">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+@push('scripts')
+<script>
+function showDeleteConfirm(reportId) {
+    // Set the form action to the correct route
+    document.getElementById('deleteFeedbackForm').action = '/industry/reports/' + reportId + '/feedback';
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    deleteModal.show();
+}
+</script>
+@endpush
+
 @endsection

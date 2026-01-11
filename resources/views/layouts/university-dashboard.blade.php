@@ -235,6 +235,9 @@
             <a href="{{ route('supervisor.university.progress') }}" class="nav-link{{ request()->routeIs('supervisor.university.progress') ? ' active' : '' }}">
                 <i class="bi bi-graph-up"></i> Student Progress
             </a>
+            <a href="{{ route('supervisor.university.history') }}" class="nav-link{{ request()->routeIs('supervisor.university.history') ? ' active' : '' }}">
+                <i class="bi bi-clock-history"></i> Internship History
+            </a>
             <a href="{{ route('supervisor.university.profile') }}" class="nav-link{{ request()->routeIs('supervisor.university.profile') ? ' active' : '' }}">
                 <i class="bi bi-person"></i> Profile
             </a>
@@ -364,12 +367,6 @@ function markAsRead(event, notificationId, url) {
     });
 }
 </script>
-    <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
-    <script src="https://files.bpcontent.cloud/2026/01/04/14/20260104145909-PNU329RH.js" defer>
-          window.botpressWebChat.init({
-            // ...your other config...
-            stylesheet: "/css/botpress-custom.css"
-        });
-    </script>
+
 </body>
 </html>

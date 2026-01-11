@@ -100,4 +100,15 @@ public function show($id)
 
     return view('industry.report_show', compact('report'));
 }
+
+public function deleteFeedback($reportId)
+{
+    $report = \App\Models\DailyReport::findOrFail($reportId);
+    $report->industry_feedback = null;
+    $report->industry_feedback_by = null;
+    $report->industry_feedback_date = null;
+    $report->save();
+
+    return redirect()->route('industry.reports')->with('success', 'Feedback deleted successfully!');
+}
 }

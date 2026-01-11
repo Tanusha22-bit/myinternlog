@@ -113,6 +113,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/supervisor/university/progress', [UniversitySupervisorProgressController::class, 'index'])->name('supervisor.university.progress')->middleware(['auth', 'force.password.change']);
     Route::get('/supervisor/university/progress/download', [UniversitySupervisorProgressController::class, 'downloadCsv'])->name('supervisor.university.progress.download')->middleware(['auth', 'force.password.change']);
     Route::delete('/supervisor/university/report/{id}/feedback', [UniversitySupervisorStudentController::class, 'deleteFeedback']);
+    Route::get('/supervisor/university/history', [App\Http\Controllers\UniversitySupervisorStudentController::class, 'history'])->name('supervisor.university.history');
+    Route::post('/supervisor/university/history/delete/{id}', [App\Http\Controllers\UniversitySupervisorStudentController::class, 'removeFromHistory'])->name('supervisor.university.history.delete');
 });
 
 Route::middleware(['auth', 'force.password.change'])->group(function () {
@@ -127,6 +129,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::delete('/industry/tasks/{task}', [App\Http\Controllers\TaskController::class, 'industryDestroy'])->name('industry.tasks.destroy');
     Route::get('/industry/reports', [IndustryReportController::class, 'index'])->name('industry.reports');
     Route::get('/industry/reports/{report}', [IndustryReportController::class, 'show'])->name('industry.reports.show');
+    Route::delete('/industry/reports/{id}/feedback', [IndustryReportController::class, 'deleteFeedback'])->name('industry.reports.feedback.delete');
     Route::post('/industry/reports/{report}/feedback', [IndustryReportController::class, 'feedback'])->name('industry.reports.feedback');
     Route::get('/industry/profile', [App\Http\Controllers\IndustryProfileController::class, 'show'])->name('industry.profile');
     Route::post('/industry/profile', [App\Http\Controllers\IndustryProfileController::class, 'update'])->name('industry.profile.update');

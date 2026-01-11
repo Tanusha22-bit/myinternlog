@@ -38,7 +38,7 @@ public function index(Request $request)
         ->select('daily_reports.*', 'users.name as student_name')
         ->get();
 
-    // Show only a few students for summary
+    // Show only 3 students for summary
     $studentSummary = $students->take(3);
 
     $announcements = \DB::table('announcements')

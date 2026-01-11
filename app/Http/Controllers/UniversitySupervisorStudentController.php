@@ -14,12 +14,12 @@ public function index(Request $request)
     if (!$supervisor) abort(403, 'Supervisor not found.');
     $supervisorId = $supervisor->id;
 
-    $statusFilter = $request->query('status');
-
+    // Only show students with active internship
     $studentsQuery = DB::table('students')
         ->join('users', 'students.user_id', '=', 'users.id')
         ->join('internships', 'students.id', '=', 'internships.student_id')
         ->where('internships.university_sv_id', $supervisorId)
+        ->where('internships.status', 'active')
         ->select(
             'students.*',
             'users.name as student_name',
@@ -27,35 +27,23 @@ public function index(Request $request)
             'internships.status'
         );
 
-    if ($statusFilter) {
-        if ($statusFilter === 'active') {
-            $studentsQuery->where('internships.status', 'active');
-        } elseif ($statusFilter === 'inactive') {
-            $studentsQuery->where('internships.status', '!=', 'active');
-        }
-    }
+    $students = $studentsQuery->paginate(10);
 
-    $students = $studentsQuery->paginate(10); // PAGINATION
-
-    // Counts for filter cards (optional)
-    $allCount = DB::table('students')
-        ->join('internships', 'students.id', '=', 'internships.student_id')
-        ->where('internships.university_sv_id', $supervisorId)
-        ->count();
-
+    // Only count active students for the cards
     $activeCount = DB::table('students')
         ->join('internships', 'students.id', '=', 'internships.student_id')
         ->where('internships.university_sv_id', $supervisorId)
         ->where('internships.status', 'active')
         ->count();
 
+    // Inactive = completed + terminated
     $inactiveCount = DB::table('students')
         ->join('internships', 'students.id', '=', 'internships.student_id')
         ->where('internships.university_sv_id', $supervisorId)
-        ->where('internships.status', '!=', 'active')
+        ->whereIn('internships.status', ['completed', 'terminated'])
         ->count();
 
-    return view('asv.studentlist', compact('students', 'allCount', 'activeCount', 'inactiveCount', 'statusFilter'));
+    return view('asv.studentlist', compact('students', 'activeCount', 'inactiveCount'));
 }
 
     public function show($id)
@@ -141,8 +129,7 @@ public function submitFeedback(Request $request, $id)
         'status' => 'reviewed',
     ]);
 
-    return redirect()->route('supervisor.university.report.show', $id)
-    ->with('success', 'Feedback submitted successfully!');
+    return back()->with('success', 'Feedback submitted successfully!');
     $student = $report->internship->student->user;
     $student->notify(new SupervisorFeedbackGiven($feedback));
 }
@@ -208,6 +195,82 @@ public function deleteFeedback($id)
         'status' => 'submitted',
     ]);
     return response()->json(['success' => true]);
+}
+
+public function history(Request $request)
+{
+    $supervisor = DB::table('university_supervisors')->where('user_id', auth()->id())->first();
+    if (!$supervisor) abort(403, 'Supervisor not found.');
+    $supervisorId = $supervisor->id;
+
+    $status = $request->query('status');
+    $search = $request->query('search');
+
+    $studentsQuery = DB::table('students')
+        ->join('users', 'students.user_id', '=', 'users.id')
+        ->join('internships', 'students.id', '=', 'internships.student_id')
+        ->where('internships.university_sv_id', $supervisorId)
+        ->whereIn('internships.status', ['completed', 'terminated'])
+        ->select(
+            'students.*',
+            'users.name as student_name',
+            'internships.company_name',
+            'internships.company_address',
+            'internships.start_date',
+            'internships.end_date',
+            'internships.status'
+        );
+
+    if ($status === 'completed') {
+        $studentsQuery->where('internships.status', 'completed');
+    } elseif ($status === 'terminated') {
+        $studentsQuery->where('internships.status', 'terminated');
+    }
+
+    if ($search) {
+        $studentsQuery->where(function($q) use ($search) {
+            $q->where('users.name', 'like', "%$search%")
+              ->orWhere('students.student_id', 'like', "%$search%")
+              ->orWhere('internships.company_name', 'like', "%$search%");
+        });
+    }
+
+    $students = $studentsQuery->paginate(10)->appends(['search' => $search, 'status' => $status]);
+
+    // Cards (no change)
+    $allCount = DB::table('students')
+        ->join('internships', 'students.id', '=', 'internships.student_id')
+        ->where('internships.university_sv_id', $supervisorId)
+        ->whereIn('internships.status', ['completed', 'terminated'])
+        ->count();
+
+    $completedCount = DB::table('students')
+        ->join('internships', 'students.id', '=', 'internships.student_id')
+        ->where('internships.university_sv_id', $supervisorId)
+        ->where('internships.status', 'completed')
+        ->count();
+
+    $terminatedCount = DB::table('students')
+        ->join('internships', 'students.id', '=', 'internships.student_id')
+        ->where('internships.university_sv_id', $supervisorId)
+        ->where('internships.status', 'terminated')
+        ->count();
+
+    return view('asv.history', compact('students', 'allCount', 'completedCount', 'terminatedCount', 'status', 'search'));
+}
+
+public function removeFromHistory($id)
+{
+    $supervisor = DB::table('university_supervisors')->where('user_id', auth()->id())->first();
+    if (!$supervisor) abort(403, 'Supervisor not found.');
+
+    // Just set university_sv_id to null for this internship
+    DB::table('internships')
+        ->where('student_id', $id)
+        ->where('university_sv_id', $supervisor->id)
+        ->update(['university_sv_id' => null]);
+
+    return redirect()->route('supervisor.university.history')->with('success', 'Student removed from your history successfully!');
 }
 
 }

@@ -119,12 +119,45 @@
     background: #0EA5E9;
     color: #fff !important;
 }
+.blink-new {
+    background: #ef4444;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.15em 0.7em;
+    font-size: 0.85em;
+    font-weight: 700;
+    margin-left: 0.5em;
+    animation: blink 1s steps(2, start) infinite;
+    vertical-align: middle;
+}
+@keyframes blink {
+    to { visibility: hidden; }
+}
+.badge-small {
+    background: #6366F1;
+    color: #fff;
+    font-size: 0.8em;
+    padding: 0.18em 0.7em;
+    border-radius: 8px;
+    font-weight: 600;
+    vertical-align: middle;
+}
+.badge-pending {
+    background: #fbbf24;
+    color: #92400E;
+    font-size: 0.8em;
+    padding: 0.18em 0.7em;
+    border-radius: 8px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 1em;
+}
 </style>
 @endsection
 
 @section('content')
 <div class="d-flex align-items-center mb-4">
-    <h2 class="me-auto mb-0">Supervisor <span class="brand-highlight">Dashboard</span></h2>
+    <h2 class="me-auto mb-0"><i class="bi bi-house-door-fill"></i> Supervisor <span class="brand-highlight">Dashboard</span></h2>
 </div>
 
 <div class="row g-4 mb-4">
@@ -161,57 +194,19 @@
         <div class="dashboard-card bg-light-indigo flex-fill w-100">
             <div class="fw-bold mb-2"><i class="bi bi-people"></i> Student Overview</div>
             <ul class="list-group list-group-flush mb-3">
-                @foreach($studentSummary as $student)
+                @php $activeStudents = $studentSummary->where('internship_status', 'active'); @endphp
+                @forelse($activeStudents as $student)
                     <li class="list-group-item d-flex align-items-center justify-content-between">
                         <span>
                             <span class="fw-semibold">{{ $student->student_id }}</span>
                             <span class="text-muted">- {{ $student->program }}</span>
                         </span>
-                        <span class="badge bg-{{ $student->internship_status == 'active' ? 'success' : ($student->internship_status == 'completed' ? 'secondary' : 'warning text-dark') }}">
-                            {{ ucfirst($student->internship_status) }}
-                        </span>
                     </li>
-                @endforeach
+                @empty
+                    <li class="list-group-item text-muted">No active students.</li>
+                @endforelse
             </ul>
             <a href="{{ route('supervisor.university.students') }}" class="dashboard-btn dashboard-btn-outline">View All Students</a>
-        </div>
-    </div>
-    <!-- Announcements -->
-    <div class="col-md-6 d-flex">
-        <div class="dashboard-card bg-light-green flex-fill w-100">
-            <div class="fw-bold mb-2"><i class="bi bi-megaphone"></i> Announcements</div>
-            <ul class="list-group list-group-flush mb-3">
-                @forelse($announcements as $announcement)
-                    <li class="list-group-item">
-                        <strong>{{ $announcement->title }}</strong>
-                        <div style="font-size:0.95em;">{!! \Illuminate\Support\Str::limit(strip_tags($announcement->content), 60) !!}</div>
-                        <div class="text-muted" style="font-size:0.85em;">{{ \Carbon\Carbon::parse($announcement->created_at)->format('d M Y') }}</div>
-                    </li>
-                @empty
-                    <li class="list-group-item text-muted">No announcements.</li>
-                @endforelse
-            </ul>
-        </div>
-    </div>
-</div>
-
-<div class="row g-4 mb-4">
-    <!-- Important Dates -->
-    <div class="col-md-6 d-flex">
-        <div class="dashboard-card bg-light-blue flex-fill w-100">
-            <div class="fw-bold mb-2"><i class="bi bi-calendar-event"></i> Important Dates</div>
-            <ul class="list-group list-group-flush mb-3">
-                @forelse($importantDates as $date)
-                    <li class="list-group-item">
-                        <strong>{{ $date->title }}</strong>
-                        <div class="text-muted" style="font-size:0.95em;">
-                            {{ \Carbon\Carbon::parse($date->date)->format('d M Y') }}
-                        </div>
-                    </li>
-                @empty
-                    <li class="list-group-item text-muted">No important dates.</li>
-                @endforelse
-            </ul>
         </div>
     </div>
     <!-- Reports Haven't Viewed -->
@@ -222,13 +217,57 @@
                 @forelse($recentReports as $report)
                     <li class="list-group-item d-flex align-items-center justify-content-between">
                         <span>{{ $report->student_name }} - {{ $report->report_date }}</span>
-                        <span class="badge bg-primary">New</span>
+                        <span class="badge badge-pending">Pending</span>
                     </li>
                 @empty
                     <li class="list-group-item text-muted">All reports reviewed!</li>
                 @endforelse
             </ul>
             <a href="{{ route('supervisor.university.students') }}" class="dashboard-btn dashboard-btn-outline-blue">View All Reports</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Announcements -->
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-green flex-fill w-100">
+            <div class="fw-bold mb-2"><i class="bi bi-megaphone"></i> Announcements</div>
+            <ul class="list-group list-group-flush mb-3">
+                @forelse($announcements as $i => $announcement)
+                    <li class="list-group-item">
+                        <strong>{{ $announcement->title }}</strong>
+                        @if($i === 0)
+                            <span class="blink-new">NEW</span>
+                        @endif
+                        <div style="font-size:0.95em;">{!! \Illuminate\Support\Str::limit(strip_tags($announcement->content), 60) !!}</div>
+                        <div class="text-muted" style="font-size:0.85em;">{{ \Carbon\Carbon::parse($announcement->created_at)->format('d M Y') }}</div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No announcements.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+    <!-- Important Dates -->
+    <div class="col-md-6 d-flex">
+        <div class="dashboard-card bg-light-blue flex-fill w-100">
+            <div class="fw-bold mb-2"><i class="bi bi-calendar-event"></i> Important Dates</div>
+            <ul class="list-group list-group-flush mb-3">
+                @forelse($importantDates as $i => $date)
+                    <li class="list-group-item">
+                        <strong>{{ $date->title }}</strong>
+                        @if($i === 0)
+                            <span class="blink-new">NEW</span>
+                        @endif
+                        <div class="text-muted" style="font-size:0.95em;">
+                            {{ \Carbon\Carbon::parse($date->date)->format('d M Y') }}
+                        </div>
+                    </li>
+                @empty
+                    <li class="list-group-item text-muted">No important dates.</li>
+                @endforelse
+            </ul>
         </div>
     </div>
 </div>
