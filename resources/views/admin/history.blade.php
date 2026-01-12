@@ -219,7 +219,7 @@
           </div>
           <div class="mb-2">
             <label class="fw-bold mb-1">Role:</label>
-            <input type="text" class="form-control" value="Student" disabled>
+            <input type="hidden" name="role" value="student">
           </div>
           <div class="mb-2">
             <label class="fw-bold mb-1">Matric ID:</label>
